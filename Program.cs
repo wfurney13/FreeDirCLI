@@ -34,7 +34,7 @@ class Program
             //get the dir size, if we dont have access to the dir just continue and let the user know
             try
             {
-                long dirSize = x.EnumerateFiles("*", System.IO.SearchOption.AllDirectories)
+                long dirSize = x.EnumerateFiles("*", SearchOption.AllDirectories)
                     .Sum(file => file.Length);
                 double GBDirSize = dirSize / 1024d / 1024d / 1024d;
                 Write($"{x.Name, -45}\t{Math.Round(GBDirSize, 4)}", ConsoleColor.Yellow);
