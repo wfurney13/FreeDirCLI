@@ -4,14 +4,13 @@ class Program
 {
     static void Main(string[] args)
     {
-        if (args[0] == null)
-        {
-            Write("Run the program with a filepath string as an argument.", ConsoleColor.Red);
-        }
-
-        if (args[0] != null)
+        try
         {
             GetSizeOfEachFolderAsync(args[0]);
+        }
+        catch (System.IndexOutOfRangeException)
+        {
+            Write("Run the program with a filepath string as an argument.", ConsoleColor.Red);
         }
     }
 
