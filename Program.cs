@@ -27,7 +27,7 @@ class Program
         DirectoryInfo dirInfo = new DirectoryInfo(args[0]);
         var directories = dirInfo.EnumerateDirectories();
 
-        Write($"{"Directory Name".PadRight(45)}\tDirectory Size (GB)", ConsoleColor.White);
+        Write($"{"Directory Name", -45}\tDirectory Size (GB)", ConsoleColor.White);
 
         foreach (var x in directories)
         {
