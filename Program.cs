@@ -1,7 +1,4 @@
-﻿using System.Dynamic;
-using Microsoft.VisualBasic.FileIO;
-
-namespace FreeDirCLI;
+﻿namespace FreeDirCLI;
 
 class Program
 {
