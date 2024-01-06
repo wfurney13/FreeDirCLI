@@ -23,23 +23,29 @@ class Program
 
     static void GetSizeOfEachFolderAsync(string[] args)
     {
-        // use the file system to recurse through each directory item and measure the length of each child item in each of those directories, sum it up, and attach it to the directory item that is returned
+        //create instance of DirectoryInfo for file path provided
         DirectoryInfo dirInfo = new DirectoryInfo(args[0]);
-        var directories = dirInfo.EnumerateDirectories();
+        //create a directories variable that is the enumerable directories of that class
+        IEnumerable<DirectoryInfo> directories = dirInfo.EnumerateDirectories();
 
         Write($"{"Directory Name", -45}\tDirectory Size (GB)", ConsoleColor.White);
 
+        //loop through each directory at the path
         foreach (var x in directories)
         {
-            //get the dir size, if we dont have access to the dir just continue and let the user know
+            //try to get the dir size, if we dont have access to the dir just continue and let the user know
             try
             {
+                //for each dir, we need to enumerate all the files within, and store the sum of those file sizes in the dirSize variable
                 long dirSize = x.EnumerateFiles("*", SearchOption.AllDirectories)
                     .Sum(file => file.Length);
+
+                //byte to GB coversion
                 double GBDirSize = dirSize / 1024d / 1024d / 1024d;
+                //Write the name and file size sum of each directory to the console
                 Write($"{x.Name, -45}\t{Math.Round(GBDirSize, 4)}", ConsoleColor.Yellow);
             }
-            catch (System.UnauthorizedAccessException)
+            catch (System.UnauthorizedAccessException) // no access to the dir
             {
                 Write($"No access to dir: {x.Name}", ConsoleColor.Red);
             }
