@@ -5,21 +5,16 @@ namespace FreeDirCLI;
 
 class Program
 {
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
-        if (args == null)
+        if (args[0] == null)
         {
-            throw new NotImplementedException();
+            Write("Run the program with a filepath string as an argument.", ConsoleColor.Red);
         }
-        //need to implement no args
 
-        // args[0] will be the file path string
-
-        if (args[0] == "-s") { }
-
-        if (args[0] != "-s")
+        if (args[0] != null)
         {
-            await GetSizeOfEachFolderAsync(args[0]);
+            GetSizeOfEachFolderAsync(args[0]);
         }
     }
 
@@ -30,14 +25,7 @@ class Program
         Console.ResetColor();
     }
 
-    static void Write(double message, ConsoleColor color)
-    {
-        Console.ForegroundColor = color;
-        Console.WriteLine(message);
-        Console.ResetColor();
-    }
-
-    static async Task GetSizeOfEachFolderAsync(string filePath)
+    static void GetSizeOfEachFolderAsync(string filePath)
     {
         // use the file system to recurse through each directory item and measure the length of each child item in each of those directories, sum it up, and attach it to the directory item that is returned
         DirectoryInfo dirInfo = new DirectoryInfo(filePath);
@@ -50,13 +38,10 @@ class Program
             //get the dir size, if we dont have access to the dir just continue and let the user know
             try
             {
-                long dirSize = await Task.Run(
-                    () =>
-                        x.EnumerateFiles("*", System.IO.SearchOption.AllDirectories)
-                            .Sum(file => file.Length)
-                );
+                long dirSize = x.EnumerateFiles("*", System.IO.SearchOption.AllDirectories)
+                    .Sum(file => file.Length);
                 double GBDirSize = dirSize / 1024d / 1024d / 1024d;
-                Write($"{x.Name.PadRight(45)}\t{Math.Round(GBDirSize, 4)}", ConsoleColor.Yellow);
+                Write($"{x.Name, -45}\t{Math.Round(GBDirSize, 4)}", ConsoleColor.Yellow);
             }
             catch (System.UnauthorizedAccessException)
             {
