@@ -4,11 +4,11 @@ class Program
 {
     static void Main(string[] args)
     {
-        try
+        if (args.Length == 1) // could be > 0 later if more args are added
         {
-            GetSizeOfEachFolderAsync(args[0]);
+            GetSizeOfEachFolderAsync(args);
         }
-        catch (System.IndexOutOfRangeException)
+        else
         {
             Write("Run the program with a filepath string as an argument.", ConsoleColor.Red);
         }
@@ -21,10 +21,10 @@ class Program
         Console.ResetColor();
     }
 
-    static void GetSizeOfEachFolderAsync(string filePath)
+    static void GetSizeOfEachFolderAsync(string[] args)
     {
         // use the file system to recurse through each directory item and measure the length of each child item in each of those directories, sum it up, and attach it to the directory item that is returned
-        DirectoryInfo dirInfo = new DirectoryInfo(filePath);
+        DirectoryInfo dirInfo = new DirectoryInfo(args[0]);
         var directories = dirInfo.EnumerateDirectories();
 
         Write($"{"Directory Name".PadRight(45)}\tDirectory Size (GB)", ConsoleColor.White);
