@@ -19,6 +19,6 @@ Build instructions (.net 7.0 required):
 
 FreeDirCLI.exe will be created at 
 
-`Z:\source\repos\FreeDirCLI\bin\Release\net7.0\FreeDirCLI.exe`
+`~\FreeDirCLI\bin\Release\net7.0\FreeDirCLI.exe`
 
 I use this tool for finding out which directories are using the most space since this info is not provided natively in the windows file explorer.
