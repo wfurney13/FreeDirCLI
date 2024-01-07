@@ -4,7 +4,7 @@
 
 <h2>Usage</h2>
 
-I use this tool to determine which directories use the most space since this info is not provided natively in the windows file explorer.
+I use this tool to determine which directories have files that use the most space since this info is not provided natively in the windows file explorer.
 
 There are two main ways to use this tool. First, you can run it with a 'file path' argument, such as `C:\` or `C:\Users`. Alternatively you can run the tool with no arguments.
 
