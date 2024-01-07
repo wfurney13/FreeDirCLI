@@ -44,16 +44,34 @@ There is also a lightmode switch ('-l'). For lightmode users or those who do not
 
 `.\fd.exe -l C:\`
 
-<h2>Optional Build instructions (.net 7.0 required)</h2>
+<h2>Optional Build and PATH instructions</h2>
+
+<h3>Build from source (.NET 7.0 required)</h3>
 
 `git clone https://github.com/wfurney13/FreeDirCLI/`
 
 `cd .\FreeDirCLI\src\`
 
-`dotnet build -c Release`
+`dotnet build`
 
 -- FreeDirCLI.exe will be created at 
 
-`~\FreeDirCLI\src\bin\Release\net7.0\FreeDirCLI.exe`
+`~\FreeDirCLI\src\bin\Debug\net7.0\FreeDirCLI.exe`
 
-I rename the exe to 'fd.exe' and then add the file path to my PATH environment variable.
+I rename the exe to 'fd.exe', move it and `FreeDirCLI.dll` to the `\FreeDirCLI\bin\` folder.
+
+<h3>PATH</h3>
+
+You can also add the filepath of the executable to your PATH environment variable.
+
+-- Add the filepath to powershell profile's PATH environment variable
+
+`notepad $profile`
+
+-- Add this line and save
+
+`$env:PATH += "C:\PATH_TO_CLONED_REPO\FreeDirCLI\bin\"`
+
+Then the program can be called with a simple
+
+`fd`
