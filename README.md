@@ -4,11 +4,12 @@ FreeDirCLI
 
 I use this tool for finding out which directories are using the most space since this info is not provided natively in the windows file explorer. This allows me to quickly determine which directories I may need to target for freeing up space. 
 
-There are two main ways to use this tool. First, you can run it with a 'file path' argument, such as C:\ or C:\Users. Alternatively you can run the tool with no arguments.
+There are two main ways to use this tool. First, you can run it with a 'file path' argument, such as `C:\` or `C:\Users`. Alternatively you can run the tool with no arguments.
 
 As this tool is a CLI, it is designed to run from the command line. All of the below examples are using powershell.
 
 Usage:
+
 -- clone the repo
 
 `git clone https://github.com/wfurney13/FreeDirCLI/`
