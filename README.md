@@ -6,7 +6,9 @@
 
 I use this tool to determine which directories have files that use the most space since this info is not provided natively in the windows file explorer.
 
-There are two main ways to use this tool. First, you can run it with a 'file path' argument, such as `C:\` or `C:\Users`. Alternatively you can run the tool with no arguments.
+![image](https://i.ibb.co/T4jZDQv/Screenshot-2024-01-11-174203.png)
+
+There are two main ways to use this tool. First, you can run it with a 'file path' argument, such as `C:\` or `C:\Users`. Alternatively you can run the tool with no arguments, or with one of the available switches (see below).
 
 As this tool is a CLI, it is designed to run from the command line. All of the below examples are using powershell.
 
@@ -76,7 +78,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `~\FreeDirCLI\src\bin\Debug\net7.0\FreeDirCLI.exe`
 
-I rename the exe to 'fd.exe', move it and `FreeDirCLI.dll` to the `\FreeDirCLI\bin\` folder.
+I rename the exe to 'fd.exe', move it, `FreeDirCLI.dll`, and `FreeDirCLI.runtimeconfig.json` to the `\FreeDirCLI\bin\` folder (or any other folder of your choice).
 
 <h3>PATH</h3>
 
@@ -86,9 +88,9 @@ You can also add the filepath of the executable to your PATH environment variabl
 
 `notepad $profile`
 
--- Add this line and save
+-- Add this line and save (replace {PATH_TO_REPO_BIN} with the path to the BIN folder that the executable is in)
 
-`$env:PATH += "C:\PATH_TO_CLONED_REPO\FreeDirCLI\bin\"`
+`$env:PATH += "C:\{PATH_TO_REPO_BIN}\"`
 
 Then the program can be called with a simple
 
