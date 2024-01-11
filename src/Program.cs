@@ -1,70 +1,49 @@
-﻿using System.Collections.Generic;
-using System.Xml;
-
-namespace FreeDirCLI;
+﻿namespace FreeDirCLI;
 
 class Program
 {
     public static bool prefersLightMode;
+    public static bool diskSizesOnly;
+    public static bool orderedOutput;
+
+    public static string? filePath;
 
     static void Main(string[] args)
     {
-        SetPrefersLightMode(args);
-
-        if (
-            args.Length == 0
-            || args[0] == "-l" && args.Length == 1
-            || args[0] == "-o" && args.Length == 1
-            || args.Contains("-l") && args.Contains("-o") && args.Length == 2
-        )
+        if (args.Contains("-l"))
         {
-            GetSizeOfAllFolders(args);
+            prefersLightMode = true;
         }
 
-        if (
-            args.Length == 1
-            && !prefersLightMode
-            && args[0] != "-o"
-            && args[0] != "-h"
-            && args[0] != "-help"
-        )
+        if (args.Contains("-d"))
         {
-            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[0]);
-            DisplayResults(args, nameAndSizePairs, true);
+            diskSizesOnly = true;
         }
 
-        if (args.Length == 2 && prefersLightMode && args[1] != "-o" && args[1] != "-l")
+        if (args.Contains("-o"))
         {
-            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[1]);
-            DisplayResults(args, nameAndSizePairs, true);
-        }
-
-        if (args.Length == 2 && !prefersLightMode)
-        {
-            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[1]);
-            DisplayResults(args, nameAndSizePairs, true);
-        }
-
-        if (args.Length == 3 && prefersLightMode)
-        {
-            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[2]);
-            DisplayResults(args, nameAndSizePairs, true);
+            orderedOutput = true;
         }
 
         if (args.Contains("-h") || args.Contains("-help"))
         {
-            Console.WriteLine(
-                $"See the readme.md file for more information about this program\n\nhttps://github.com/wfurney13/FreeDirCLI/blob/master/README.md"
-            );
+            DisplayHelpMessage();
         }
+        else
+        {
+            ParseArgsAndSetFilePath(args);
+        }
+
+        CheckForPathAndRun();
     }
 
-    static void SetPrefersLightMode(string[] args)
+    static void DisplayHelpMessage()
     {
-        if (args.Length > 0 && args.Contains("-l"))
-        {
-            prefersLightMode = true;
-        }
+        Write(
+            $"See the readme.md file for more information about this program\n\nhttps://github.com/wfurney13/FreeDirCLI/blob/master/README.md",
+            ConsoleColor.Red,
+            false
+        );
     }
 
     static void Write(string message, ConsoleColor color, bool lightMode)
@@ -81,53 +60,67 @@ class Program
         }
     }
 
-    static void GetSizeOfAllFolders(string[] args)
+    static void ParseArgsAndSetFilePath(string[] args)
     {
-        Write(
-            "When no file path is provided as an argument, this tool will scan all of your drives, sum up the file sizes of each directory, and return the results. Would you like to use the tool on all drives?",
-            ConsoleColor.Blue,
-            prefersLightMode
-        );
-        string? n = Console.ReadLine();
-        switch (n)
+        if (args.Length == 1)
         {
-            case "y":
-            case "Y":
-                DriveInfo[] drives = DriveInfo.GetDrives();
-                foreach (var drive in drives)
-                {
-                    Write(
-                        $"\nRetreiving info for {drive}...\n",
-                        ConsoleColor.Blue,
-                        prefersLightMode
-                    );
-                    Write(
-                        $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
-                        ConsoleColor.Blue,
-                        prefersLightMode
-                    );
-                    //fix this with ordering
-                    var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
-                    DisplayResults(args, nameAndSizePairsForDrive, true);
-                }
-                break;
-            default:
-                Write(
-                    "Run this program with a file path as an argument.",
-                    ConsoleColor.Blue,
-                    prefersLightMode
-                );
-                break;
+            if (!prefersLightMode && !diskSizesOnly && !orderedOutput) // if there is only one argument and it is not -h, -help, -d , -l or -o. It should be a file path
+            {
+                filePath = args[0];
+            }
+        }
+        if (args.Length == 2)
+        {
+            if (args[1].Length > 2) // ensure args[1] is not a switch
+            {
+                filePath = args[1];
+            }
+        }
+        if (args.Length == 3 && prefersLightMode) // the only situation where there should be three arguments is when prefersLightMode is true
+        {
+            filePath = args[2];
         }
     }
 
-    static Dictionary<string, double> GetSizeOfEachFolderForPath(string filePath)
+    static void CheckForPathAndRun()
+    {
+        if (filePath == null)
+        {
+            GetSizeOfAllFolders();
+        }
+        else
+        {
+            var nameAndSizePairs = GetSizeOfEachFolderForPath(filePath);
+            DisplayResults(nameAndSizePairs);
+        }
+    }
+
+    static void GetSizeOfAllFolders()
+    {
+        DriveInfo[] drives = DriveInfo.GetDrives();
+        foreach (var drive in drives)
+        {
+            Write($"\nRetreiving info for {drive}...\n", ConsoleColor.Blue, prefersLightMode);
+            Write(
+                $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
+                ConsoleColor.Blue,
+                prefersLightMode
+            );
+            if (!diskSizesOnly)
+            {
+                var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
+                DisplayResults(nameAndSizePairsForDrive);
+            }
+        }
+    }
+
+    static Dictionary<string, double> GetSizeOfEachFolderForPath(string arg)
     {
         //create dictionary for holding directory name and sizes
         Dictionary<string, double> nameSizePairs = new();
 
         //create instance of DirectoryInfo for file path provided
-        DirectoryInfo dirInfo = new(filePath);
+        DirectoryInfo dirInfo = new(arg);
         //create a directories variable that is the enumerable directories of that class
         var directories = TryEnumerateDirectories(dirInfo);
         Write(
@@ -174,9 +167,9 @@ class Program
         }
     }
 
-    static void DisplayResults(string[] args, Dictionary<string, double> pairs, bool orderBySize)
+    static void DisplayResults(Dictionary<string, double> pairs)
     {
-        if (args.Contains("-o"))
+        if (orderedOutput)
         {
             var orderedPairs = pairs
                 .OrderByDescending(x => x.Value)
