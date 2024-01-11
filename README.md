@@ -44,6 +44,8 @@ This will get the names of the subdirectories at that path, add up their file si
 
 * Order by size descending (-o)
 
+`.\fd.exe -o`
+
 `.\fd.exe -o C:\`
 
 `.\fd.exe -l -o C:\`
