@@ -42,6 +42,8 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l C:\`
 
+![image](https://i.ibb.co/GtsY17S/Screenshot-2024-01-11-173408.png)
+
 * Order by size descending (-o)
 
 `.\fd.exe -o`
@@ -50,11 +52,15 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l -o C:\`
 
+![image](https://i.ibb.co/B60k6Nh/Screenshot-2024-01-11-173428.png)
+
 * Show Drive info only (-d)
 
 `.\fd.exe -d`
 
 `.\fd.exe -l -d`
+
+![image](https://i.ibb.co/ngSfj41/Screenshot-2024-01-11-173454.png)
 
 <h2>Optional Build and PATH instructions</h2>
 
