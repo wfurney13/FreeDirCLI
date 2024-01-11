@@ -34,7 +34,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe`
 
-There is also a lightmode switch ('-l'). For lightmode users or those who do not want colored text in the output, -l should be passed as the first argument.
+There is lightmode switch (-l). For lightmode users or those who do not want colored text in the output, -l should be passed as the first argument.
 
 -- Call the executable without a file path argument and with the light mode switch
 
@@ -43,6 +43,21 @@ There is also a lightmode switch ('-l'). For lightmode users or those who do not
 -- Call the executable with a file path argument and the light mode switch
 
 `.\fd.exe -l C:\`
+
+There is an order by switch (-o) to order by size descending
+
+-- Call the executable with a file path argument and with the order by switch
+
+`.\fd.exe -o C:\`
+
+-- Call the executable without a file path argument, with the light mode switch, and with the order by switch
+
+`.\fd.exe -l -o`
+
+-- Call the executable with a file path argument, with the light mode switch, and with the order by switch
+
+`.\fd.exe -l -o C:\`
+
 
 <h2>Optional Build and PATH instructions</h2>
 
