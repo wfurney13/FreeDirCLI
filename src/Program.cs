@@ -1,4 +1,6 @@
-﻿namespace FreeDirCLI;
+﻿using System.Collections.Generic;
+
+namespace FreeDirCLI;
 
 class Program
 {
@@ -8,25 +10,44 @@ class Program
     {
         SetPrefersLightMode(args);
 
-        if (args.Length == 0 || args[0] == "-l" && args.Length == 1)
+        if (
+            args.Length == 0
+            || args[0] == "-l" && args.Length == 1
+            || args[0] == "-o" && args.Length == 1
+            || args.Contains("-l") && args.Contains("-o") && args.Length == 2
+        )
         {
-            GetSizeOfAllFolders();
+            GetSizeOfAllFolders(args);
         }
 
-        if (args.Length == 1 && !prefersLightMode)
+        if (args.Length == 1 && !prefersLightMode && args[0] != "-o")
         {
-            GetSizeOfEachFolderForPath(args[0]);
+            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[0]);
+            DisplayResults(args, nameAndSizePairs, true);
         }
 
-        if (args.Length == 2 && prefersLightMode)
+        if (args.Length == 2 && prefersLightMode && args[1] != "-o" && args[1] != "-l")
         {
-            GetSizeOfEachFolderForPath(args[1]);
+            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[1]);
+            DisplayResults(args, nameAndSizePairs, true);
+        }
+
+        if (args.Length == 2 && !prefersLightMode)
+        {
+            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[1]);
+            DisplayResults(args, nameAndSizePairs, true);
+        }
+
+        if (args.Length == 3 && prefersLightMode)
+        {
+            var nameAndSizePairs = GetSizeOfEachFolderForPath(args[2]);
+            DisplayResults(args, nameAndSizePairs, true);
         }
     }
 
     static void SetPrefersLightMode(string[] args)
     {
-        if (args.Length > 0 && args[0] == "-l")
+        if (args.Length > 0 && args.Contains("-l"))
         {
             prefersLightMode = true;
         }
@@ -46,7 +67,7 @@ class Program
         }
     }
 
-    static void GetSizeOfAllFolders()
+    static void GetSizeOfAllFolders(string[] args)
     {
         Write(
             "When no file path is provided as an argument, this tool will scan all of your drives, sum up the file sizes of each directory, and return the results. Would you like to use the tool on all drives?",
@@ -71,7 +92,9 @@ class Program
                         ConsoleColor.Blue,
                         prefersLightMode
                     );
-                    GetSizeOfEachFolderForPath(drive.ToString());
+                    //fix this with ordering
+                    var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
+                    DisplayResults(args, nameAndSizePairsForDrive, true);
                 }
                 break;
             default:
@@ -84,13 +107,15 @@ class Program
         }
     }
 
-    static void GetSizeOfEachFolderForPath(string filePath)
+    static Dictionary<string, double> GetSizeOfEachFolderForPath(string filePath)
     {
+        //create dictionary for holding directory name and sizes
+        Dictionary<string, double> nameSizePairs = new();
+
         //create instance of DirectoryInfo for file path provided
         DirectoryInfo dirInfo = new(filePath);
         //create a directories variable that is the enumerable directories of that class
-        IEnumerable<DirectoryInfo> directories = dirInfo.EnumerateDirectories();
-
+        var directories = TryEnumerateDirectories(dirInfo);
         Write(
             $"\n{"Directory Name", -45}\tDirectory Size (GB)\n",
             ConsoleColor.White,
@@ -111,16 +136,62 @@ class Program
                 //byte to GB coversion
                 double GBDirSize = dirSize / 1024d / 1024d / 1024d;
 
-                //Write the name and file size sum of each directory to the console
-                Write(
-                    $"{dir.Name, -45}\t{Math.Round(GBDirSize, 4)}",
-                    ConsoleColor.Yellow,
-                    prefersLightMode
-                );
+                // //Write the name and file size sum of each directory to the console
+                // Write(
+                //     $"{dir.Name, -45}\t{Math.Round(GBDirSize, 4)}",
+                //     ConsoleColor.Yellow,
+                //     prefersLightMode
+                // );
+
+                nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
             }
             catch (System.UnauthorizedAccessException) // no access to the dir
             {
                 Write($"No access to dir: {dir.Name}", ConsoleColor.Red, prefersLightMode);
+            }
+        }
+        return nameSizePairs;
+    }
+
+    static IEnumerable<DirectoryInfo> TryEnumerateDirectories(DirectoryInfo directoryInfo)
+    {
+        try
+        {
+            IEnumerable<DirectoryInfo> directories = directoryInfo.EnumerateDirectories();
+            return directories;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            Write($"Provided file path is invalid\n", ConsoleColor.Red, false);
+            throw;
+        }
+    }
+
+    static void DisplayResults(string[] args, Dictionary<string, double> pairs, bool orderBySize)
+    {
+        if (args.Contains("-o"))
+        {
+            var orderedPairs = pairs
+                .OrderByDescending(x => x.Value)
+                .ToDictionary(x => x.Key, x => x.Value);
+            foreach (var keyValuePair in orderedPairs)
+            {
+                Write(
+                    $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
+                    ConsoleColor.Yellow,
+                    prefersLightMode
+                );
+            }
+        }
+        else
+        {
+            foreach (var keyValuePair in pairs)
+            {
+                Write(
+                    $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
+                    ConsoleColor.Yellow,
+                    prefersLightMode
+                );
             }
         }
     }
