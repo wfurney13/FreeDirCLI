@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 
 namespace FreeDirCLI;
 
@@ -20,7 +21,13 @@ class Program
             GetSizeOfAllFolders(args);
         }
 
-        if (args.Length == 1 && !prefersLightMode && args[0] != "-o")
+        if (
+            args.Length == 1
+            && !prefersLightMode
+            && args[0] != "-o"
+            && args[0] != "-h"
+            && args[0] != "-help"
+        )
         {
             var nameAndSizePairs = GetSizeOfEachFolderForPath(args[0]);
             DisplayResults(args, nameAndSizePairs, true);
@@ -42,6 +49,13 @@ class Program
         {
             var nameAndSizePairs = GetSizeOfEachFolderForPath(args[2]);
             DisplayResults(args, nameAndSizePairs, true);
+        }
+
+        if (args.Contains("-h") || args.Contains("-help"))
+        {
+            Console.WriteLine(
+                $"See the readme.md file for more information about this program\n\nhttps://github.com/wfurney13/FreeDirCLI/blob/master/README.md"
+            );
         }
     }
 
@@ -135,13 +149,6 @@ class Program
 
                 //byte to GB coversion
                 double GBDirSize = dirSize / 1024d / 1024d / 1024d;
-
-                // //Write the name and file size sum of each directory to the console
-                // Write(
-                //     $"{dir.Name, -45}\t{Math.Round(GBDirSize, 4)}",
-                //     ConsoleColor.Yellow,
-                //     prefersLightMode
-                // );
 
                 nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
             }
