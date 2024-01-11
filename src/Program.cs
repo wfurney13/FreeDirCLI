@@ -32,9 +32,8 @@ class Program
         else
         {
             ParseArgsAndSetFilePath(args);
+            CheckForPathAndRun();
         }
-
-        CheckForPathAndRun();
     }
 
     static void DisplayHelpMessage()
