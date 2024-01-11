@@ -50,7 +50,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l -o C:\`
 
-* Show Drives only (-d)
+* Show Drive info only (-d)
 
 `.\fd.exe -d`
 
