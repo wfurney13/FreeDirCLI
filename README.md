@@ -88,7 +88,7 @@ You can also add the filepath of the executable to your PATH environment variabl
 
 `notepad $profile`
 
--- Add this line and save (replace {PATH_TO_REPO_BIN} with the path to the BIN folder that the executable is in)
+-- Add this line and save (replace {PATH_TO_REPO_BIN} with the path to the bin folder that the executable is in)
 
 `$env:PATH += "C:\{PATH_TO_REPO_BIN}\"`
 
