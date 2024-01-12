@@ -18,9 +18,9 @@ As this tool is a CLI, it is designed to run from the command line. All of the b
 
 `git clone https://github.com/wfurney13/FreeDirCLI/`
 
--- change directory to the 'bin' folder
+-- change directory to the 'bin' folder and operating system
 
-`cd .\FreeDirCLI\bin\`
+`cd .\FreeDirCLI\bin\Windows\`
 
 -- Run the program with a file path argument
 
@@ -72,25 +72,51 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `cd .\FreeDirCLI\src\`
 
-`dotnet build`
+<h3>Windows</h3>
 
--- FreeDirCLI.exe will be created at 
+`dotnet build -o ..\bin\Windows\`
 
-`~\FreeDirCLI\src\bin\Debug\net7.0\FreeDirCLI.exe`
+-- FreeDirCLI.exe file will be created at 
 
-I rename the exe to 'fd.exe', move it, `FreeDirCLI.dll`, and `FreeDirCLI.runtimeconfig.json` to the `\FreeDirCLI\bin\` folder (or any other folder of your choice).
+`~\FreeDirCLI\bin\Windows\FreeDirCLI.exe`
 
-<h3>PATH</h3>
+<h3>Linux</h3>
 
-You can also add the filepath of the executable to your PATH environment variable.
+`dotnet build -o ../bin/Linux/`
+
+-- FreeDirCLI file will be created at 
+
+`~\FreeDirCLI\bin\Linux\FreeDirCLI`
+
+I rename the exe or bin to 'fd.exe' or 'fd'
+
+<h3>Add to PATH</h3>
+
+<h3>Windows</h3>
 
 -- Add the filepath to powershell profile's PATH environment variable
 
 `notepad $profile`
 
--- Add this line and save (replace {PATH_TO_REPO_BIN} with the path to the bin folder that the executable is in)
+-- Add this line and save (replace PATH_TO_REPO_BIN with the path to the bin\Windows\ folder that the executable is in)
 
-`$env:PATH += "C:\{PATH_TO_REPO_BIN}\"`
+`$env:PATH += "C:\PATH_TO_REPO_BIN\"`
+
+Then the program can be called with a simple
+
+`fd`
+
+<h3>Linux</h3>
+
+-- Example for bash
+
+`vim ~/.bashrc`
+
+`export PATH=$PATH:/PATH_TO_REPO_BIN/Linux`
+
+Then source your ~/.bashrc
+
+`source ~/.bashrc`
 
 Then the program can be called with a simple
 
