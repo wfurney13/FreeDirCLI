@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "wrTEzK5mFqlJVj6aapj54nunAzR/RwoflYIc8l1qvEFj0gUzGpQ49S83F18omppURDRgsjROzYikx13MFbdcPA==",
+  "dgSpecHash": "ZsADsQ6zOtfPGjXAxHkRFIgVg7dbzF2P277dBenuaMJEc0YhllrytJQ3RJLlI3XDLvkOcJGu8WX81T+m+7t97g==",
   "success": true,
   "projectFilePath": "Z:\\source\\repos\\FreeDirCLI\\src\\FreeDirCLI.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\wfurn\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\7.0.12\\microsoft.netcore.app.runtime.win-x64.7.0.12.nupkg.sha512",
+    "C:\\Users\\wfurn\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\7.0.12\\microsoft.windowsdesktop.app.runtime.win-x64.7.0.12.nupkg.sha512",
+    "C:\\Users\\wfurn\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\7.0.12\\microsoft.aspnetcore.app.runtime.win-x64.7.0.12.nupkg.sha512"
+  ],
   "logs": []
 }
