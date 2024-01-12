@@ -14,13 +14,15 @@ As this tool is a CLI, it is designed to run from the command line. All of the b
 
 <h2>Examples</h2>
 
--- clone the repo
+-- Download the binary for your OS (Windows or Linux)
 
-`git clone https://github.com/wfurney13/FreeDirCLI/`
+-- Open your shell, change directory to the path that you have saved the executable to (alternatively see instructions below for adding the executable to the PATH)
 
--- change directory to the 'bin' folder and operating system
+`cd C:\bin\`
 
-`cd .\FreeDirCLI\bin\Windows\`
+-- Run without a file path argument
+
+`.\fd.exe`
 
 -- Run the program with a file path argument
 
@@ -31,10 +33,6 @@ As this tool is a CLI, it is designed to run from the command line. All of the b
 `.\fd.exe 'C:\Program Files (x86)\'`
 
 This will get the names of the subdirectories at that path, add up their file sizes, and return the name and sum. When no file path is provided as an argument, this tool will scan all of your drives, sum up the file sizes of each directory, and return the results.
-
--- Call the executable without a file path argument
-
-`.\fd.exe`
 
 <h2>Available Switches</h2>
 
@@ -80,17 +78,24 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `~\FreeDirCLI\bin\Windows\FreeDirCLI.exe`
 
+-- To publish only the self-contained executable at C:\bin\
+
+`dotnet publish -o C:\bin\ -r win-x64`
+
 <h3>Linux</h3>
 
 `dotnet build -o ../bin/Linux/`
 
 -- FreeDirCLI file will be created at 
 
-`~\FreeDirCLI\bin\Linux\FreeDirCLI`
+`~/FreeDirCLI/bin/Linux/FreeDirCLI`
 
-I rename the exe or bin to 'fd.exe' or 'fd'
+-- To publish only the self-contained executable at ~/bin/
 
-<h3>Add to PATH</h3>
+`dotnet publish -o ~/bin/ -r linux-x64`
+
+
+<h3>Add to PATH Instructions</h3>
 
 <h3>Windows</h3>
 
@@ -102,7 +107,7 @@ I rename the exe or bin to 'fd.exe' or 'fd'
 
 `$env:PATH += "C:\PATH_TO_REPO_BIN\"`
 
-Then the program can be called with a simple
+Restart powershell, then the program can be called with a simple
 
 `fd`
 
