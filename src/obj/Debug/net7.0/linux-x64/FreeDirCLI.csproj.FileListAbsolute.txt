@@ -1,0 +1,16 @@
+/mnt/z/source/repos/FreeDirCLI/bin/FreeDirCLI
+/mnt/z/source/repos/FreeDirCLI/bin/FreeDirCLI.deps.json
+/mnt/z/source/repos/FreeDirCLI/bin/FreeDirCLI.runtimeconfig.json
+/mnt/z/source/repos/FreeDirCLI/bin/FreeDirCLI.dll
+/mnt/z/source/repos/FreeDirCLI/bin/FreeDirCLI.pdb
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.GeneratedMSBuildEditorConfig.editorconfig
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.AssemblyInfoInputs.cache
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.AssemblyInfo.cs
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.csproj.CoreCompileInputs.cache
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.sourcelink.json
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.csproj.CopyComplete
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.dll
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/refint/FreeDirCLI.dll
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.pdb
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/FreeDirCLI.genruntimeconfig.cache
+/mnt/z/source/repos/FreeDirCLI/src/obj/Debug/net7.0/linux-x64/ref/FreeDirCLI.dll
