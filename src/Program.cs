@@ -25,7 +25,7 @@ class Program
             orderedOutput = true;
         }
 
-        if (args.Contains("-h") || args.Contains("-help"))
+        if (args.Contains("-h"))
         {
             DisplayHelpMessage();
         }
@@ -70,7 +70,7 @@ class Program
         }
         if (args.Length == 2)
         {
-            if (args[1].Length > 2) // ensure args[1] is not a switch
+            if (args[1].Length > 2) // ensure args[1] is not a supported switch (and should thus be a file path)
             {
                 filePath = args[1];
             }
@@ -83,11 +83,11 @@ class Program
 
     static void CheckForPathAndRun()
     {
-        if (filePath == null)
+        if (filePath == null) // when there is no file path passed in we want to run for all folders
         {
             GetSizeOfAllFolders();
         }
-        else
+        else // otherwise use the file path that was passed in
         {
             var nameAndSizePairs = GetSizeOfEachFolderForPath(filePath);
             DisplayResults(nameAndSizePairs);
