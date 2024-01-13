@@ -10,9 +10,11 @@ class Program
 
     static void Main(string[] args)
     {
+        Config.CheckConfig(args); // if the user has a config file setup but passes in some of these arguments we want to choose what they passed in anyway instead of whats in the config file
+
         if (args.Contains("-l"))
         {
-            prefersLightMode = true;
+            prefersLightMode = !prefersLightMode; // prefersLightMode is initialized to false. If it is set to 'true' in the config, and -l is still passed in, we want to set it to false instead of true.
         }
 
         if (args.Contains("-d"))
@@ -22,12 +24,12 @@ class Program
 
         if (args.Contains("-o"))
         {
-            orderedOutput = true;
+            orderedOutput = !orderedOutput; // orderedOutput is initialized to false. If it is set to 'true' in the config, and -o is still passed in, we want to set it to false instead of true.
         }
 
-        if (args.Contains("-h"))
+        if (args.Contains("-h") || args.Contains("-help"))
         {
-            DisplayHelpMessage();
+            Helper.DisplayHelpMessage();
         }
         else
         {
@@ -36,46 +38,23 @@ class Program
         }
     }
 
-    static void DisplayHelpMessage()
-    {
-        Write(
-            $"See the readme.md file for more information about this program\n\nhttps://github.com/wfurney13/FreeDirCLI/blob/master/README.md",
-            ConsoleColor.Red,
-            false
-        );
-    }
-
-    static void Write(string message, ConsoleColor color, bool lightMode)
-    {
-        if (prefersLightMode == false)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-        else //lightmode users do not get a fancy color
-        {
-            Console.WriteLine(message);
-        }
-    }
-
     static void ParseArgsAndSetFilePath(string[] args)
     {
         if (args.Length == 1)
         {
-            if (!prefersLightMode && !diskSizesOnly && !orderedOutput) // if there is only one argument and it is not -h, -help, -d , -l or -o. It should be a file path
+            if (!args[0].StartsWith("-")) // if there is only one argument and it is not -*. It should be a file path
             {
                 filePath = args[0];
             }
         }
         if (args.Length == 2)
         {
-            if (args[1].Length > 2) // ensure args[1] is not a supported switch (and should thus be a file path)
+            if (!args[1].StartsWith("-")) // ensure args[1] is not a supported switch (and should thus be a file path)
             {
                 filePath = args[1];
             }
         }
-        if (args.Length == 3 && prefersLightMode) // the only situation where there should be three arguments is when prefersLightMode is true
+        if (args.Length == 3) // if there are 3 arguments filePath should always be args[2]
         {
             filePath = args[2];
         }
@@ -96,11 +75,36 @@ class Program
 
     static void GetSizeOfAllFolders()
     {
+        if (!diskSizesOnly)
+        {
+            Helper.Write("Run program for all drives?", ConsoleColor.Blue, prefersLightMode);
+
+            string? getSizeOfAllFolderResponse = Console.ReadLine();
+
+            if (getSizeOfAllFolderResponse == null)
+            {
+                return;
+            }
+            switch (getSizeOfAllFolderResponse.ToLower())
+            {
+                case "y":
+                    break;
+                case "n":
+                    return;
+                default:
+                    return;
+            }
+        }
+
         DriveInfo[] drives = DriveInfo.GetDrives();
         foreach (var drive in drives)
         {
-            Write($"\nRetreiving info for {drive}...\n", ConsoleColor.Blue, prefersLightMode);
-            Write(
+            Helper.Write(
+                $"\nRetreiving info for {drive}...\n",
+                ConsoleColor.Blue,
+                prefersLightMode
+            );
+            Helper.Write(
                 $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
                 ConsoleColor.Blue,
                 prefersLightMode
@@ -113,16 +117,17 @@ class Program
         }
     }
 
-    static Dictionary<string, double> GetSizeOfEachFolderForPath(string arg)
+    static Dictionary<string, double> GetSizeOfEachFolderForPath(string filePath)
     {
         //create dictionary for holding directory name and sizes
         Dictionary<string, double> nameSizePairs = new();
 
         //create instance of DirectoryInfo for file path provided
-        DirectoryInfo dirInfo = new(arg);
+        DirectoryInfo dirInfo = new(filePath);
+
         //create a directories variable that is the enumerable directories of that class
         var directories = TryEnumerateDirectories(dirInfo);
-        Write(
+        Helper.Write(
             $"\n{"Directory Name", -45}\tDirectory Size (GB)\n",
             ConsoleColor.White,
             prefersLightMode
@@ -146,13 +151,13 @@ class Program
             }
             catch (System.UnauthorizedAccessException) // no access to the dir
             {
-                Write($"No access to dir: {dir.Name}", ConsoleColor.Red, prefersLightMode);
+                Helper.Write($"No access to dir: {dir.Name}", ConsoleColor.Red, prefersLightMode);
             }
         }
         return nameSizePairs;
     }
 
-    static IEnumerable<DirectoryInfo> TryEnumerateDirectories(DirectoryInfo directoryInfo)
+    public static IEnumerable<DirectoryInfo> TryEnumerateDirectories(DirectoryInfo directoryInfo)
     {
         try
         {
@@ -161,7 +166,7 @@ class Program
         }
         catch (DirectoryNotFoundException)
         {
-            Write($"Provided file path is invalid\n", ConsoleColor.Red, false);
+            Helper.Write($"Provided file path is invalid\n", ConsoleColor.Red, false);
             throw;
         }
     }
@@ -175,7 +180,7 @@ class Program
                 .ToDictionary(x => x.Key, x => x.Value);
             foreach (var keyValuePair in orderedPairs)
             {
-                Write(
+                Helper.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     prefersLightMode
@@ -186,7 +191,7 @@ class Program
         {
             foreach (var keyValuePair in pairs)
             {
-                Write(
+                Helper.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     prefersLightMode
