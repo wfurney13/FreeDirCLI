@@ -3,7 +3,7 @@ namespace FreeDirCLI;
 public class Config
 {
     public static string configPath = Environment.ExpandEnvironmentVariables(
-        @"%userprofile%\Documents\FreeDirCLI\config.txt"
+        @"%userprofile%\Documents\FreeDirCLI\fd.config"
     );
 
     public static void CheckConfig(string[] args)
