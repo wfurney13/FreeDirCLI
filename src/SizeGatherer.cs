@@ -75,7 +75,6 @@ namespace FreeDirCLI
             //create instance of DirectoryInfo for file path provided
             DirectoryInfo dirInfo = new(filePath);
 
-            //create a directories variable that is the enumerable directories of that class
             var directories = TryEnumerateDirectories(dirInfo);
 
             //loop through each directory at the path
