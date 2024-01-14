@@ -1,4 +1,8 @@
-﻿namespace FreeDirCLI;
+﻿using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks.Dataflow;
+
+namespace FreeDirCLI;
 
 class Program
 {
@@ -64,26 +68,7 @@ class Program
             }
 
             Helper.WriteInline("> ", ConsoleColor.Green, prefersLightMode);
-            var console = Console.ReadLine();
-
-            while (console == "")
-            {
-                Helper.WriteInline("> ", ConsoleColor.Green, prefersLightMode);
-                console = Console.ReadLine();
-            }
-
-            if (console == ":q")
-            {
-                return;
-            }
-
-            if (console != null)
-            {
-                userContinued = true;
-                //assume what is passed to the console will be a file path displayed in the results
-                var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(console);
-                Program.DisplayResults(nameAndSizePairs);
-            }
+            Helper.HandleReadLine(Console.ReadLine());
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Threading.Tasks.Dataflow;
+
 namespace FreeDirCLI
 {
     public class SizeGatherer
@@ -78,7 +80,11 @@ namespace FreeDirCLI
             var directories = TryEnumerateDirectories(dirInfo);
 
             //loop through each directory at the path
-            Helper.WriteInline("Loading...");
+            Helper.WriteInline(
+                $"\nLoading {filePath} ...",
+                ConsoleColor.Magenta,
+                Program.prefersLightMode
+            );
 
             foreach (var dir in directories)
             {
@@ -126,7 +132,11 @@ namespace FreeDirCLI
             }
             catch (DirectoryNotFoundException)
             {
-                Helper.Write($"Provided file path is invalid\n", ConsoleColor.Red, false);
+                Helper.Write(
+                    $"Provided file path ({directoryInfo.FullName}) is invalid\n",
+                    ConsoleColor.Red,
+                    false
+                );
                 throw;
             }
         }
