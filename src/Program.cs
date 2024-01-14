@@ -5,169 +5,17 @@ class Program
     public static bool prefersLightMode;
     public static bool diskSizesOnly;
     public static bool orderedOutput;
-
-    public static string? filePath;
+    public static bool allDisks;
+    public static bool userContinued;
 
     static void Main(string[] args)
     {
-        if (args.Contains("-l"))
-        {
-            prefersLightMode = true;
-        }
-
-        if (args.Contains("-d"))
-        {
-            diskSizesOnly = true;
-        }
-
-        if (args.Contains("-o"))
-        {
-            orderedOutput = true;
-        }
-
-        if (args.Contains("-h"))
-        {
-            DisplayHelpMessage();
-        }
-        else
-        {
-            ParseArgsAndSetFilePath(args);
-            CheckForPathAndRun();
-        }
+        ArgumentParser.Run(args);
     }
 
-    static void DisplayHelpMessage()
+    public static void DisplayResults(Dictionary<string, double> pairs)
     {
-        Write(
-            $"See the readme.md file for more information about this program\n\nhttps://github.com/wfurney13/FreeDirCLI/blob/master/README.md",
-            ConsoleColor.Red,
-            false
-        );
-    }
-
-    static void Write(string message, ConsoleColor color, bool lightMode)
-    {
-        if (prefersLightMode == false)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-        else //lightmode users do not get a fancy color
-        {
-            Console.WriteLine(message);
-        }
-    }
-
-    static void ParseArgsAndSetFilePath(string[] args)
-    {
-        if (args.Length == 1)
-        {
-            if (!prefersLightMode && !diskSizesOnly && !orderedOutput) // if there is only one argument and it is not -h, -help, -d , -l or -o. It should be a file path
-            {
-                filePath = args[0];
-            }
-        }
-        if (args.Length == 2)
-        {
-            if (args[1].Length > 2) // ensure args[1] is not a supported switch (and should thus be a file path)
-            {
-                filePath = args[1];
-            }
-        }
-        if (args.Length == 3 && prefersLightMode) // the only situation where there should be three arguments is when prefersLightMode is true
-        {
-            filePath = args[2];
-        }
-    }
-
-    static void CheckForPathAndRun()
-    {
-        if (filePath == null) // when there is no file path passed in we want to run for all folders
-        {
-            GetSizeOfAllFolders();
-        }
-        else // otherwise use the file path that was passed in
-        {
-            var nameAndSizePairs = GetSizeOfEachFolderForPath(filePath);
-            DisplayResults(nameAndSizePairs);
-        }
-    }
-
-    static void GetSizeOfAllFolders()
-    {
-        DriveInfo[] drives = DriveInfo.GetDrives();
-        foreach (var drive in drives)
-        {
-            Write($"\nRetreiving info for {drive}...\n", ConsoleColor.Blue, prefersLightMode);
-            Write(
-                $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
-                ConsoleColor.Blue,
-                prefersLightMode
-            );
-            if (!diskSizesOnly)
-            {
-                var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
-                DisplayResults(nameAndSizePairsForDrive);
-            }
-        }
-    }
-
-    static Dictionary<string, double> GetSizeOfEachFolderForPath(string arg)
-    {
-        //create dictionary for holding directory name and sizes
-        Dictionary<string, double> nameSizePairs = new();
-
-        //create instance of DirectoryInfo for file path provided
-        DirectoryInfo dirInfo = new(arg);
-        //create a directories variable that is the enumerable directories of that class
-        var directories = TryEnumerateDirectories(dirInfo);
-        Write(
-            $"\n{"Directory Name", -45}\tDirectory Size (GB)\n",
-            ConsoleColor.White,
-            prefersLightMode
-        );
-
-        //loop through each directory at the path
-
-        foreach (var dir in directories)
-        {
-            //try to get the dir size, if we dont have access to the dir just continue and let the user know
-            try
-            {
-                //for each dir, we need to enumerate all the files within, and store the sum of those file sizes in the dirSize variable
-                long dirSize = dir.EnumerateFiles("*", SearchOption.AllDirectories)
-                    .Sum(file => file.Length);
-
-                //byte to GB coversion
-                double GBDirSize = dirSize / 1024d / 1024d / 1024d;
-
-                nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
-            }
-            catch (System.UnauthorizedAccessException) // no access to the dir
-            {
-                Write($"No access to dir: {dir.Name}", ConsoleColor.Red, prefersLightMode);
-            }
-        }
-        return nameSizePairs;
-    }
-
-    static IEnumerable<DirectoryInfo> TryEnumerateDirectories(DirectoryInfo directoryInfo)
-    {
-        try
-        {
-            IEnumerable<DirectoryInfo> directories = directoryInfo.EnumerateDirectories();
-            return directories;
-        }
-        catch (DirectoryNotFoundException)
-        {
-            Write($"Provided file path is invalid\n", ConsoleColor.Red, false);
-            throw;
-        }
-    }
-
-    static void DisplayResults(Dictionary<string, double> pairs)
-    {
+        double totalSize = 0;
         if (orderedOutput)
         {
             var orderedPairs = pairs
@@ -175,22 +23,66 @@ class Program
                 .ToDictionary(x => x.Key, x => x.Value);
             foreach (var keyValuePair in orderedPairs)
             {
-                Write(
+                Helper.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     prefersLightMode
                 );
+
+                totalSize += keyValuePair.Value;
             }
         }
         else
         {
             foreach (var keyValuePair in pairs)
             {
-                Write(
+                Helper.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     prefersLightMode
                 );
+
+                totalSize += keyValuePair.Value;
+            }
+        }
+
+        Helper.Write(
+            $"\nUsed Space: {Math.Round(totalSize, 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
+            ConsoleColor.Red,
+            false
+        );
+
+        if (!allDisks)
+        {
+            if (!userContinued)
+            {
+                Helper.Write(
+                    "Type New Path (:q to quit, {Arrow Key Up} to fill in previous path)",
+                    ConsoleColor.Green,
+                    prefersLightMode
+                );
+            }
+
+            Helper.WriteInline("> ", ConsoleColor.Green, prefersLightMode);
+            var console = Console.ReadLine();
+
+            while (console == "")
+            {
+                Helper.WriteInline("> ", ConsoleColor.Green, prefersLightMode);
+                console = Console.ReadLine();
+            }
+
+            if (console == ":q")
+            {
+                return;
+            }
+
+            if (console != null)
+            {
+                userContinued = true;
+                //assume what is passed to the console will be a file path displayed in the results
+                var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(console);
+                Program.DisplayResults(nameAndSizePairs);
             }
         }
     }
