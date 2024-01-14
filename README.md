@@ -62,6 +62,20 @@ This will get the names of the subdirectories at that path, add up their file si
 
 ![image](https://i.ibb.co/ngSfj41/Screenshot-2024-01-11-173454.png)
 
+* Configuration (-config)
+
+Allows you to save choices for '-l' or '-o'
+
+`.\fd.exe -config`
+
+For Windows, the config file will be saved at:
+
+`%userprofile%\Documents\FreeDirCLI\config.txt`
+
+For Linux, the config file will be saved at:
+
+`%HOME%/.fd_config`
+
 <h2>Optional Build and PATH instructions</h2>
 
 <h3>Build from source (.NET 7.0 required)</h3>
