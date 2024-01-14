@@ -1,13 +1,15 @@
 namespace FreeDirCLI;
 
-public class Config
+class Config
 {
-    public static string configPath = Environment.ExpandEnvironmentVariables(
-        @"%userprofile%\Documents\FreeDirCLI\fd.config"
-    );
+    public static string? configPath;
+    public static string? configDirectory;
+    public static bool isWindows = OperatingSystem.IsWindows();
 
     public static void CheckConfig(string[] args)
     {
+        SetConfigPath();
+
         if (args.Contains("-config"))
         {
             if (File.Exists(configPath))
@@ -27,8 +29,6 @@ public class Config
                     case "y":
                         CreateConfigFile();
                         break;
-                    case "n":
-                        break;
                     default:
                         break;
                 }
@@ -46,19 +46,47 @@ public class Config
         }
     }
 
+    static void SetConfigPath()
+    {
+        if (isWindows)
+        {
+            configPath = Environment.ExpandEnvironmentVariables(
+                @"%userprofile%\Documents\FreeDirCLI\config.txt"
+            );
+            configDirectory = Environment.ExpandEnvironmentVariables(
+                @"%userprofile%\Documents\FreeDirCLI\"
+            );
+        }
+        if (!isWindows)
+        {
+            configPath = Environment.ExpandEnvironmentVariables(@"%HOME%/.fd_config");
+            configDirectory = Environment.ExpandEnvironmentVariables(@"%HOME%/");
+        }
+        if (configPath == null || configDirectory == null)
+        {
+            throw new DirectoryNotFoundException(
+                "Could not set configPath or configDirectory for environment"
+            );
+        }
+    }
+
     static void CreateConfigFile()
     {
-        string directoryPath = Environment.ExpandEnvironmentVariables(
-            @"%userprofile%\Documents\FreeDirCLI\"
-        ); // I dont think this will work for linux?
+        if (configPath == null || configDirectory == null)
+        {
+            throw new DirectoryNotFoundException(
+                "Could not set configPath or configDirectory for environment"
+            );
+        }
+
         if (File.Exists(configPath))
         {
             File.Delete(configPath);
         }
 
-        if (!Directory.Exists(directoryPath))
+        if (!Directory.Exists(configDirectory))
         {
-            Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(configDirectory);
         }
 
         Helper.Write("Would you like to default to light mode? y/n");
@@ -101,6 +129,13 @@ public class Config
 
     static void SetConfigChoices()
     {
+        if (configPath == null || configDirectory == null)
+        {
+            throw new DirectoryNotFoundException(
+                "Could not set configPath or configDirectory for environment"
+            );
+        }
+
         IEnumerable<string> lines = File.ReadLines(configPath);
 
         foreach (string line in lines)

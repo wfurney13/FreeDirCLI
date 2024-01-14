@@ -21,6 +21,25 @@ public class Helper
         Console.WriteLine(message);
     }
 
+    public static void WriteInline(string message, ConsoleColor color, bool lightMode)
+    {
+        if (Program.prefersLightMode == false)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(message);
+            Console.ResetColor();
+        }
+        else //lightmode users do not get a fancy color
+        {
+            WriteInline(message);
+        }
+    }
+
+    public static void WriteInline(string message)
+    {
+        Console.Write(message);
+    }
+
     public static void DisplayHelpMessage()
     {
         Write(
