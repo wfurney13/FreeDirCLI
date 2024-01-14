@@ -57,7 +57,7 @@ class Program
             if (!userContinued)
             {
                 Helper.Write(
-                    "Type New Path (:q to quit, {Arrow Key Up} to fill in previous path)",
+                    "Type New Path (:q to quit, {Up Arrow Key} to fill in previous path)",
                     ConsoleColor.Green,
                     prefersLightMode
                 );
