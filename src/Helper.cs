@@ -10,7 +10,7 @@ public class Helper
             Console.WriteLine(message);
             Console.ResetColor();
         }
-        else //lightmode users do not get a fancy color
+        else
         {
             Write(message);
         }
@@ -29,7 +29,7 @@ public class Helper
             Console.Write(message);
             Console.ResetColor();
         }
-        else //lightmode users do not get a fancy color
+        else
         {
             WriteInline(message);
         }
