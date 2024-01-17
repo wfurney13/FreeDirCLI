@@ -45,11 +45,22 @@ class Program
             }
         }
 
-        Writer.Write(
-            $"\nUsed Space: {Math.Round(totalSize, 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
-            ConsoleColor.Red,
-            false
-        );
+        if (totalSize > 1)
+        {
+            Writer.Write(
+                $"\nUsed Space: {Math.Round(totalSize, 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
+                ConsoleColor.Red,
+                false
+                );
+        }
+        else
+        {
+            Writer.Write(
+                $"\nUsed Space: {Math.Round(totalSize, 4)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
+                ConsoleColor.Red,
+                false
+                );
+        }
 
         if (SizeGatherer.filePath != null)
         {
