@@ -35,6 +35,7 @@ class Config
         {
             return;
         }
+
         switch (lightmodeConfigResponse.ToString().ToLower())
         {
             case "y":
@@ -46,12 +47,14 @@ class Config
             default:
                 break;
         }
+
         Writer.Write("Would you like to default output to ordered by size descending? y/n");
         string? orderedOutputConfigResponse = Console.ReadLine();
         if (orderedOutputConfigResponse == null)
         {
             return;
         }
+
         switch (orderedOutputConfigResponse.ToString().ToLower())
         {
             case "y":
@@ -81,6 +84,7 @@ class Config
         {
             return;
         }
+
         switch (recreateConfigFileResponse.ToString().ToLower())
         {
             case "y":
@@ -102,11 +106,13 @@ class Config
                 @"%userprofile%\Documents\FreeDirCLI\"
             );
         }
+
         if (!OperatingSystem.IsWindows())
         {
             configPath = Environment.ExpandEnvironmentVariables(@"%HOME%/.fd_config");
             configDirectory = Environment.ExpandEnvironmentVariables(@"%HOME%/");
         }
+
         if (configPath == null || configDirectory == null)
         {
             throw new DirectoryNotFoundException(

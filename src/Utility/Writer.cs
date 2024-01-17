@@ -24,7 +24,7 @@ public class Writer
     public static void HandleReadLine(string? consoleResponse)
     {
         bool newPath = false;
-        
+
         while (consoleResponse == "")
         {
             Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
@@ -54,12 +54,12 @@ public class Writer
                         }
                     }
                 }
-                
+
                 if (consoleResponse.ToLower() == ":b" || consoleResponse.ToLower() == "back")
                 {
                     TrimFilePathBackOneLevel();
                 }
-                    //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
+                //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
                 else if (
                     SizeGatherer.filePath != null
                     && SizeGatherer.filePath.EndsWith($"{Config.slashType}")
@@ -73,6 +73,7 @@ public class Writer
                 {
                     Writer.AddSlashToFilePath();
                 }
+
                 if (SizeGatherer.filePath != null)
                 {
                     var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
@@ -97,6 +98,7 @@ public class Writer
         {
             SizeGatherer.filePath += $"{Config.slashType}";
         }
+
         // this is absolutely terrible and could be done with regex but is a hack "for now"...
         if (SizeGatherer.filePath != null && SizeGatherer.filePath.EndsWith($"{Config.slashType}"))
         {
@@ -156,6 +158,4 @@ public class Writer
         Console.Write(new string(' ', Console.BufferWidth));
         Console.SetCursorPosition(0, Console.CursorTop - 1);
     }
-
-    public static void SaveResults() { }
 }

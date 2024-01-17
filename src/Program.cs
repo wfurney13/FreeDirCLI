@@ -23,7 +23,7 @@ class Program
             foreach (var keyValuePair in orderedPairs)
             {
                 Writer.Write(
-                    $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
+                    $"{keyValuePair.Key,-45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     Config.prefersLightMode
                 );
@@ -36,7 +36,7 @@ class Program
             foreach (var keyValuePair in pairsTask)
             {
                 Writer.Write(
-                    $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
+                    $"{keyValuePair.Key,-45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
                     Config.prefersLightMode
                 );
@@ -71,7 +71,6 @@ class Program
 
         if (!Config.allDisks)
         {
-
             Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
             Writer.HandleReadLine(Console.ReadLine());
         }

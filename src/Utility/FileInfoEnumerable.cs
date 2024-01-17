@@ -19,10 +19,9 @@ namespace FreeDirCLI
             IEnumerable<FileInfo> matches = new List<FileInfo>();
             try
             {
-                    matches = matches.Concat(
-                        _root.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                    );
-
+                matches = matches.Concat(
+                    _root.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
+                );
             }
             catch (UnauthorizedAccessException)
             {
@@ -47,11 +46,11 @@ namespace FreeDirCLI
             //return all the directory matches
             foreach (var dir in _root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
-                    var fileInfos = new FileInfoEnumerable(dir);
-                    foreach (var match in fileInfos)
-                    {
-                        yield return match;
-                    }
+                IEnumerable<long> fileInfosLengths = new FileInfoEnumerable(dir);
+                foreach (var fileLength in fileInfosLengths)
+                {
+                    yield return fileLength;
+                }
             }
         }
 

@@ -39,6 +39,7 @@ namespace FreeDirCLI
                     Writer.DisplayHelpMessage();
                     return;
                 }
+
                 switch (getSizeOfAllFolderResponse.ToLower())
                 {
                     case "y":
@@ -58,12 +59,12 @@ namespace FreeDirCLI
                         $"\nRetreiving info for {drive}...\n",
                         ConsoleColor.Blue,
                         Config.prefersLightMode
-                        );
+                    );
                     Writer.Write(
-                        $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d,2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d),2} GB\n",
+                        $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d),2} GB\n",
                         ConsoleColor.Blue,
                         Config.prefersLightMode
-                        );
+                    );
                     if (!Config.diskSizesOnly)
                     {
                         var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
@@ -97,14 +98,12 @@ namespace FreeDirCLI
 
                     if (GBDirSize < 1)
                     {
-                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize,4));
+                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
                     }
                     else
                     {
-                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize,2));
+                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 2));
                     }
-
-
                 }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {
@@ -119,7 +118,7 @@ namespace FreeDirCLI
             Writer.ClearLastLine();
 
             Writer.Write(
-                $"\n\n{"Directory Name", -45}\tDirectory Size (GB)\n",
+                $"\n\n{"Directory Name",-45}\tDirectory Size (GB)\n",
                 ConsoleColor.White,
                 Config.prefersLightMode
             );
