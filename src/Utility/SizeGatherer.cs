@@ -50,22 +50,25 @@ namespace FreeDirCLI
                 }
             }
 
-            foreach (var drive in Program.drives)
+            if (Program.drives != null)
             {
-                Writer.Write(
-                    $"\nRetreiving info for {drive}...\n",
-                    ConsoleColor.Blue,
-                    Config.prefersLightMode
-                );
-                Writer.Write(
-                    $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
-                    ConsoleColor.Blue,
-                    Config.prefersLightMode
-                );
-                if (!Config.diskSizesOnly)
+                foreach (var drive in Program.drives)
                 {
-                    var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
-                    Program.DisplayResults(nameAndSizePairsForDrive);
+                    Writer.Write(
+                        $"\nRetreiving info for {drive}...\n",
+                        ConsoleColor.Blue,
+                        Config.prefersLightMode
+                        );
+                    Writer.Write(
+                        $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d,2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d),2} GB\n",
+                        ConsoleColor.Blue,
+                        Config.prefersLightMode
+                        );
+                    if (!Config.diskSizesOnly)
+                    {
+                        var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
+                        Program.DisplayResults(nameAndSizePairsForDrive);
+                    }
                 }
             }
         }
@@ -92,7 +95,16 @@ namespace FreeDirCLI
                     //byte to GB coversion
                     double GBDirSize = dirSize / 1024d / 1024d / 1024d;
 
-                    nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
+                    if (GBDirSize < 1)
+                    {
+                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize,4));
+                    }
+                    else
+                    {
+                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize,2));
+                    }
+
+
                 }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {

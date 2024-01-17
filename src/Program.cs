@@ -3,11 +3,11 @@
 class Program
 {
     public static bool userContinued;
-    public static DriveInfo[] drives;
+    public static DriveInfo[]? drives;
 
     static void Main(string[] args)
     {
-        Program.drives = DriveInfo.GetDrives();
+        drives = DriveInfo.GetDrives();
         ArgumentParser.Run(args);
     }
 

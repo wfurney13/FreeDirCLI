@@ -42,14 +42,16 @@ public class Writer
 
             try
             {
-                
-                //if the user passes in a new file path starting with one of their drives we know its a whole new path
-                foreach (var drive in Program.drives)
+                if (Program.drives != null)
                 {
-                    if (consoleResponse.ToUpper().StartsWith(drive.ToString().ToUpper()))
+                    //if the user passes in a new file path starting with one of their drives we know its a whole new path
+                    foreach (var drive in Program.drives)
                     {
-                        SizeGatherer.filePath = consoleResponse;
-                        newPath = true;
+                        if (consoleResponse.ToUpper().StartsWith(drive.ToString().ToUpper()))
+                        {
+                            SizeGatherer.filePath = consoleResponse;
+                            newPath = true;
+                        }
                     }
                 }
                 
