@@ -2,27 +2,16 @@ using System.Collections;
 
 namespace FreeDirCLI
 {
-    public class FileInfoEnumerable : IEnumerable<FileInfo>
+    public class FileInfoEnumerable : IEnumerable<long>
     {
         private readonly DirectoryInfo _root;
-        private readonly IList<string> _patterns;
-        private readonly SearchOption _option;
 
-        public FileInfoEnumerable(DirectoryInfo root, string pattern, SearchOption option)
+        public FileInfoEnumerable(DirectoryInfo root)
         {
             _root = root;
-            _patterns = new List<string> { pattern };
-            _option = option;
         }
 
-        public FileInfoEnumerable(DirectoryInfo root, IList<string> patterns, SearchOption option)
-        {
-            _root = root;
-            _patterns = patterns;
-            _option = option;
-        }
-
-        public IEnumerator<FileInfo> GetEnumerator()
+        public IEnumerator<long> GetEnumerator()
         {
             if (_root == null || !_root.Exists)
                 yield break;
@@ -30,12 +19,10 @@ namespace FreeDirCLI
             IEnumerable<FileInfo> matches = new List<FileInfo>();
             try
             {
-                foreach (var pattern in _patterns)
-                {
                     matches = matches.Concat(
-                        _root.EnumerateFiles(pattern, SearchOption.TopDirectoryOnly)
+                        _root.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
                     );
-                }
+
             }
             catch (UnauthorizedAccessException)
             {
@@ -51,21 +38,20 @@ namespace FreeDirCLI
                 yield break;
             }
 
+            //return all the file matches
             foreach (var file in matches)
             {
-                yield return file;
+                yield return file.Length;
             }
 
-            if (_option == SearchOption.AllDirectories)
+            //return all the directory matches
+            foreach (var dir in _root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
-                foreach (var dir in _root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-                {
-                    var FileInfos = new FileInfoEnumerable(dir, _patterns, _option);
-                    foreach (var match in FileInfos)
+                    var fileInfos = new FileInfoEnumerable(dir);
+                    foreach (var match in fileInfos)
                     {
                         yield return match;
                     }
-                }
             }
         }
 

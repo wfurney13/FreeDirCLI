@@ -4,71 +4,11 @@ class Config
 {
     public static string? configPath;
     public static string? configDirectory;
-    public static bool isWindows = OperatingSystem.IsWindows();
-
-    public static void CheckConfig(string[] args)
-    {
-        SetConfigPath();
-
-        if (args.Contains("-config"))
-        {
-            if (File.Exists(configPath))
-            {
-                Helper.Write(
-                    $"Configuration file already exists. Would you like to delete and recreate the config file? y/n",
-                    ConsoleColor.White,
-                    true
-                );
-                string? recreateConfigFileResponse = Console.ReadLine();
-                if (recreateConfigFileResponse == null)
-                {
-                    return;
-                }
-                switch (recreateConfigFileResponse.ToString().ToLower())
-                {
-                    case "y":
-                        CreateConfigFile();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (!File.Exists(configPath))
-            {
-                CreateConfigFile();
-            }
-        }
-
-        if (File.Exists(configPath))
-        {
-            SetConfigChoices();
-        }
-    }
-
-    static void SetConfigPath()
-    {
-        if (isWindows)
-        {
-            configPath = Environment.ExpandEnvironmentVariables(
-                @"%userprofile%\Documents\FreeDirCLI\config.txt"
-            );
-            configDirectory = Environment.ExpandEnvironmentVariables(
-                @"%userprofile%\Documents\FreeDirCLI\"
-            );
-        }
-        if (!isWindows)
-        {
-            configPath = Environment.ExpandEnvironmentVariables(@"%HOME%/.fd_config");
-            configDirectory = Environment.ExpandEnvironmentVariables(@"%HOME%/");
-        }
-        if (configPath == null || configDirectory == null)
-        {
-            throw new DirectoryNotFoundException(
-                "Could not set configPath or configDirectory for environment"
-            );
-        }
-    }
+    public static bool prefersLightMode;
+    public static bool diskSizesOnly;
+    public static bool orderedOutput;
+    public static bool allDisks;
+    public static string? slashType;
 
     static void CreateConfigFile()
     {
@@ -89,7 +29,7 @@ class Config
             Directory.CreateDirectory(configDirectory);
         }
 
-        Helper.Write("Would you like to default to light mode? y/n");
+        Writer.Write("Would you like to default to light mode? y/n");
         string? lightmodeConfigResponse = Console.ReadLine();
         if (lightmodeConfigResponse == null)
         {
@@ -106,7 +46,7 @@ class Config
             default:
                 break;
         }
-        Helper.Write("Would you like to default output to ordered by size descending? y/n");
+        Writer.Write("Would you like to default output to ordered by size descending? y/n");
         string? orderedOutputConfigResponse = Console.ReadLine();
         if (orderedOutputConfigResponse == null)
         {
@@ -124,7 +64,55 @@ class Config
                 break;
         }
 
-        Helper.Write("Config file created.", ConsoleColor.Yellow, true);
+        Writer.Write($"Config file created at {configPath}.", ConsoleColor.Yellow, true);
+    }
+
+    static void ConfigRecreate()
+    {
+        Writer.Write(
+            $"Configuration file already exists. Would you like to delete and recreate the config file? y/n",
+            ConsoleColor.White,
+            true
+        );
+
+        string? recreateConfigFileResponse = Console.ReadLine();
+
+        if (recreateConfigFileResponse == null)
+        {
+            return;
+        }
+        switch (recreateConfigFileResponse.ToString().ToLower())
+        {
+            case "y":
+                CreateConfigFile();
+                break;
+            default:
+                break;
+        }
+    }
+
+    static void SetConfigPath()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            configPath = Environment.ExpandEnvironmentVariables(
+                @"%userprofile%\Documents\FreeDirCLI\config.txt"
+            );
+            configDirectory = Environment.ExpandEnvironmentVariables(
+                @"%userprofile%\Documents\FreeDirCLI\"
+            );
+        }
+        if (!OperatingSystem.IsWindows())
+        {
+            configPath = Environment.ExpandEnvironmentVariables(@"%HOME%/.fd_config");
+            configDirectory = Environment.ExpandEnvironmentVariables(@"%HOME%/");
+        }
+        if (configPath == null || configDirectory == null)
+        {
+            throw new DirectoryNotFoundException(
+                "Could not set configPath or configDirectory for environment"
+            );
+        }
     }
 
     static void SetConfigChoices()
@@ -143,18 +131,58 @@ class Config
             switch (line)
             {
                 case "prefersLightMode = 1":
-                    Program.prefersLightMode = true;
+                    prefersLightMode = true;
                     break;
                 case "prefersLightMode = 0":
-                    Program.prefersLightMode = false;
+                    prefersLightMode = false;
                     break;
                 case "orderedOutput = 1":
-                    Program.orderedOutput = true;
+                    orderedOutput = true;
                     break;
                 case "orderedOutput = 0":
-                    Program.orderedOutput = false;
+                    orderedOutput = false;
                     break;
             }
+        }
+    }
+
+    public static void CheckConfig(string[] args)
+    {
+        SetConfigPath();
+
+        if (args.Contains("-config"))
+        {
+            if (File.Exists(configPath))
+            {
+                ConfigRecreate();
+            }
+
+            if (!File.Exists(configPath))
+            {
+                CreateConfigFile();
+            }
+
+            if (configPath != null)
+            {
+                Writer.Write(configPath);
+            }
+        }
+
+        if (File.Exists(configPath))
+        {
+            SetConfigChoices();
+        }
+    }
+
+    public static void GetSlashType()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            slashType = "\\";
+        }
+        else
+        {
+            slashType = "/";
         }
     }
 }

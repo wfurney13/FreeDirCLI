@@ -1,36 +1,31 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks.Dataflow;
-
-namespace FreeDirCLI;
+﻿namespace FreeDirCLI;
 
 class Program
 {
-    public static bool prefersLightMode;
-    public static bool diskSizesOnly;
-    public static bool orderedOutput;
-    public static bool allDisks;
     public static bool userContinued;
+    public static DriveInfo[] drives;
 
     static void Main(string[] args)
     {
+        Program.drives = DriveInfo.GetDrives();
         ArgumentParser.Run(args);
     }
 
-    public static void DisplayResults(Dictionary<string, double> pairs)
+    public static void DisplayResults(Dictionary<string, double> pairsTask)
     {
         double totalSize = 0;
-        if (orderedOutput)
+
+        if (Config.orderedOutput)
         {
-            var orderedPairs = pairs
+            var orderedPairs = pairsTask
                 .OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
             foreach (var keyValuePair in orderedPairs)
             {
-                Helper.Write(
+                Writer.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
-                    prefersLightMode
+                    Config.prefersLightMode
                 );
 
                 totalSize += keyValuePair.Value;
@@ -38,37 +33,47 @@ class Program
         }
         else
         {
-            foreach (var keyValuePair in pairs)
+            foreach (var keyValuePair in pairsTask)
             {
-                Helper.Write(
+                Writer.Write(
                     $"{keyValuePair.Key, -45}\t{keyValuePair.Value}",
                     ConsoleColor.Yellow,
-                    prefersLightMode
+                    Config.prefersLightMode
                 );
 
                 totalSize += keyValuePair.Value;
             }
         }
 
-        Helper.Write(
+        Writer.Write(
             $"\nUsed Space: {Math.Round(totalSize, 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
             ConsoleColor.Red,
             false
         );
 
-        if (!allDisks)
+        if (SizeGatherer.filePath != null)
         {
-            if (!userContinued)
-            {
-                Helper.Write(
-                    "Type New Path (:q to quit, {Up Arrow Key} to fill in previous path)",
-                    ConsoleColor.Green,
-                    prefersLightMode
-                );
-            }
+            Writer.Write(
+                $"{SizeGatherer.filePath.ToUpper()}",
+                ConsoleColor.Green,
+                Config.prefersLightMode
+            );
+        }
 
-            Helper.WriteInline("> ", ConsoleColor.Green, prefersLightMode);
-            Helper.HandleReadLine(Console.ReadLine());
+        if (!userContinued)
+        {
+            Writer.Write(
+                $"(:q to quit, :b to go back)",
+                ConsoleColor.Green,
+                Config.prefersLightMode
+            );
+        }
+
+        if (!Config.allDisks)
+        {
+
+            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+            Writer.HandleReadLine(Console.ReadLine());
         }
     }
 }

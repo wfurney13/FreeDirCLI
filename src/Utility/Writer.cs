@@ -1,10 +1,10 @@
 namespace FreeDirCLI;
 
-public class Helper
+public class Writer
 {
     public static void Write(string message, ConsoleColor color, bool lightMode)
     {
-        if (Program.prefersLightMode == false)
+        if (Config.prefersLightMode == false)
         {
             Console.ForegroundColor = color;
             Console.WriteLine(message);
@@ -23,9 +23,11 @@ public class Helper
 
     public static void HandleReadLine(string? consoleResponse)
     {
+        bool newPath = false;
+        
         while (consoleResponse == "")
         {
-            Helper.WriteInline("> ", ConsoleColor.Green, Program.prefersLightMode);
+            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
             consoleResponse = Console.ReadLine();
         }
 
@@ -38,35 +40,36 @@ public class Helper
         {
             Program.userContinued = true;
 
-            string slashType;
-
-            if (Config.isWindows)
-            {
-                slashType = "\\";
-            }
-            else
-            {
-                slashType = "/";
-            }
-            //assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
-
             try
             {
-                if (consoleResponse.ToLower() == "back")
+                
+                //if the user passes in a new file path starting with one of their drives we know its a whole new path
+                foreach (var drive in Program.drives)
                 {
-                    TrimFilePathBackOneLevel(slashType);
+                    if (consoleResponse.ToUpper().StartsWith(drive.ToString().ToUpper()))
+                    {
+                        SizeGatherer.filePath = consoleResponse;
+                        newPath = true;
+                    }
                 }
+                
+                if (consoleResponse.ToLower() == ":b" || consoleResponse.ToLower() == "back")
+                {
+                    TrimFilePathBackOneLevel();
+                }
+                    //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
                 else if (
-                    SizeGatherer.filePath != null && SizeGatherer.filePath.EndsWith($"{slashType}")
+                    SizeGatherer.filePath != null
+                    && SizeGatherer.filePath.EndsWith($"{Config.slashType}")
+                    && newPath == false
                 )
                 {
                     SizeGatherer.filePath += $"{consoleResponse}";
+                    Writer.AddSlashToFilePath();
                 }
-                else if (
-                    SizeGatherer.filePath != null && !SizeGatherer.filePath.EndsWith($"{slashType}")
-                )
+                else if (newPath == false)
                 {
-                    SizeGatherer.filePath += $"{slashType}{consoleResponse}{slashType}";
+                    Writer.AddSlashToFilePath();
                 }
                 if (SizeGatherer.filePath != null)
                 {
@@ -78,25 +81,25 @@ public class Helper
             }
             catch (Exception)
             {
-                Helper.WriteInline("> ", ConsoleColor.Green, Program.prefersLightMode);
-                TrimFilePathBackOneLevel(slashType);
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                TrimFilePathBackOneLevel();
                 Write($"{SizeGatherer.filePath}");
-                Helper.HandleReadLine(Console.ReadLine());
+                Writer.HandleReadLine(Console.ReadLine());
             }
         }
     }
 
-    public static void TrimFilePathBackOneLevel(string slashType)
+    public static void TrimFilePathBackOneLevel()
     {
-        if (SizeGatherer.filePath != null && !SizeGatherer.filePath.EndsWith($"{slashType}"))
+        if (SizeGatherer.filePath != null && !SizeGatherer.filePath.EndsWith($"{Config.slashType}"))
         {
-            SizeGatherer.filePath += $"{slashType}";
+            SizeGatherer.filePath += $"{Config.slashType}";
         }
         // this is absolutely terrible and could be done with regex but is a hack "for now"...
-        if (SizeGatherer.filePath != null && SizeGatherer.filePath.EndsWith($"{slashType}"))
+        if (SizeGatherer.filePath != null && SizeGatherer.filePath.EndsWith($"{Config.slashType}"))
         {
             SizeGatherer.filePath = SizeGatherer.filePath.Remove(SizeGatherer.filePath.Length - 1);
-            while (!SizeGatherer.filePath.EndsWith($"{slashType}")) //lmao wtf
+            while (!SizeGatherer.filePath.EndsWith($"{Config.slashType}")) //lmao wtf
             {
                 SizeGatherer.filePath = SizeGatherer.filePath.Remove(
                     SizeGatherer.filePath.Length - 1 //ridiculous but works
@@ -105,9 +108,21 @@ public class Helper
         }
     }
 
+    public static void AddSlashToFilePath()
+    {
+        if (
+            SizeGatherer.filePath != null
+            && Config.slashType != null
+            && !SizeGatherer.filePath.EndsWith(Config.slashType)
+        )
+        {
+            SizeGatherer.filePath += Config.slashType;
+        }
+    }
+
     public static void WriteInline(string message, ConsoleColor color, bool lightMode)
     {
-        if (Program.prefersLightMode == false)
+        if (Config.prefersLightMode == false)
         {
             Console.ForegroundColor = color;
             Console.Write(message);
@@ -132,4 +147,13 @@ public class Helper
             false
         );
     }
+
+    public static void ClearLastLine()
+    {
+        Console.SetCursorPosition(0, Console.CursorTop - 1);
+        Console.Write(new string(' ', Console.BufferWidth));
+        Console.SetCursorPosition(0, Console.CursorTop - 1);
+    }
+
+    public static void SaveResults() { }
 }

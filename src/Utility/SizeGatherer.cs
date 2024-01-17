@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks.Dataflow;
 
 namespace FreeDirCLI
@@ -6,6 +7,7 @@ namespace FreeDirCLI
     {
         public static int UnauthorizedAccessExceptionFileCount;
         public static string? filePath;
+        public static List<Dictionary<string, double>>? previousResults;
 
         public static void CheckForPathAndRun()
         {
@@ -22,46 +24,45 @@ namespace FreeDirCLI
 
         public static void GetSizeOfAllFolders()
         {
-            if (!Program.diskSizesOnly)
+            if (!Config.diskSizesOnly)
             {
-                Helper.Write(
+                Writer.Write(
                     "Run program for all drives? y/n",
                     ConsoleColor.Blue,
-                    Program.prefersLightMode
+                    Config.prefersLightMode
                 );
 
                 string? getSizeOfAllFolderResponse = Console.ReadLine();
 
                 if (getSizeOfAllFolderResponse == null)
                 {
-                    Helper.DisplayHelpMessage();
+                    Writer.DisplayHelpMessage();
                     return;
                 }
                 switch (getSizeOfAllFolderResponse.ToLower())
                 {
                     case "y":
-                        Program.allDisks = true;
+                        Config.allDisks = true;
                         break;
                     default:
-                        Helper.DisplayHelpMessage();
+                        Writer.DisplayHelpMessage();
                         return;
                 }
             }
 
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (var drive in drives)
+            foreach (var drive in Program.drives)
             {
-                Helper.Write(
+                Writer.Write(
                     $"\nRetreiving info for {drive}...\n",
                     ConsoleColor.Blue,
-                    Program.prefersLightMode
+                    Config.prefersLightMode
                 );
-                Helper.Write(
+                Writer.Write(
                     $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d, 2)} GB\n",
                     ConsoleColor.Blue,
-                    Program.prefersLightMode
+                    Config.prefersLightMode
                 );
-                if (!Program.diskSizesOnly)
+                if (!Config.diskSizesOnly)
                 {
                     var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
                     Program.DisplayResults(nameAndSizePairsForDrive);
@@ -79,23 +80,14 @@ namespace FreeDirCLI
 
             var directories = TryEnumerateDirectories(dirInfo);
 
-            //loop through each directory at the path
-            Helper.WriteInline(
-                $"\nLoading {filePath} ...",
-                ConsoleColor.Magenta,
-                Program.prefersLightMode
-            );
-
             foreach (var dir in directories)
             {
                 //try to get the dir size, if we dont have access to the dir just continue and let the user know
                 try
                 {
                     long dirSize = new FileInfoEnumerable(
-                        dir,
-                        "*",
-                        SearchOption.AllDirectories
-                    ).Sum(file => file.Length);
+                        dir
+                    ).Sum(fileLength => fileLength);
 
                     //byte to GB coversion
                     double GBDirSize = dirSize / 1024d / 1024d / 1024d;
@@ -104,18 +96,20 @@ namespace FreeDirCLI
                 }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {
-                    Helper.Write(
+                    Writer.Write(
                         $"No access to dir: {dir.Name}",
                         ConsoleColor.Red,
-                        Program.prefersLightMode
+                        Config.prefersLightMode
                     );
                 }
             }
 
-            Helper.Write(
+            Writer.ClearLastLine();
+
+            Writer.Write(
                 $"\n\n{"Directory Name", -45}\tDirectory Size (GB)\n",
                 ConsoleColor.White,
-                Program.prefersLightMode
+                Config.prefersLightMode
             );
 
             return nameSizePairs;
@@ -132,7 +126,7 @@ namespace FreeDirCLI
             }
             catch (DirectoryNotFoundException)
             {
-                Helper.Write(
+                Writer.Write(
                     $"Provided file path ({directoryInfo.FullName}) is invalid\n",
                     ConsoleColor.Red,
                     false

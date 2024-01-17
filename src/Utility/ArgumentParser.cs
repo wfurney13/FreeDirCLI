@@ -8,22 +8,22 @@ namespace FreeDirCLI
 
             if (args.Contains("-l"))
             {
-                Program.prefersLightMode = !Program.prefersLightMode; // if prefersLightMode = true in the config file, when -l is provided, we want prefersLightMode = false. Otherwise (or if there is no config file) prefersLightMode = false, and when -l is provided, it will flip it to true
+                Config.prefersLightMode = !Config.prefersLightMode; // if prefersLightMode = true in the config file, when -l is provided, we want prefersLightMode = false. Otherwise (or if there is no config file) prefersLightMode = false, and when -l is provided, it will flip it to true
             }
 
             if (args.Contains("-d"))
             {
-                Program.diskSizesOnly = true;
+                Config.diskSizesOnly = true;
             }
 
             if (args.Contains("-o"))
             {
-                Program.orderedOutput = !Program.orderedOutput; // orderedOutput is initialized to false. If it is set to 'true' in the config, and -o is still passed in, we want to set it to false instead of true.
+                Config.orderedOutput = !Config.orderedOutput; // orderedOutput is initialized to false. If it is set to 'true' in the config, and -o is still passed in, we want to set it to false instead of true.
             }
 
             if (args.Contains("-h") || args.Contains("-help"))
             {
-                Helper.DisplayHelpMessage();
+                Writer.DisplayHelpMessage();
             }
             else
             {
@@ -52,6 +52,10 @@ namespace FreeDirCLI
             {
                 SizeGatherer.filePath = args[2];
             }
+
+            Config.GetSlashType();
+
+            Writer.AddSlashToFilePath();
         }
     }
 }

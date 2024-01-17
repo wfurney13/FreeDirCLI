@@ -76,6 +76,23 @@ For Linux, the config file will be saved at:
 
 `%HOME%/.fd_config`
 
+<h2>Example Functions</h2>
+
+You can add functions to your powershell profile that use this tool, here are some examples
+
+function sdrive {
+fd S:\SteamLibrary\steamapps\common
+}
+
+
+function fddl {
+fd C:\Users\wfurn\Downloads 
+}
+
+function dl {
+fd -d
+}
+
 <h2>Optional Build and PATH instructions</h2>
 
 <h3>Build from source (.NET 7.0 required)</h3>
