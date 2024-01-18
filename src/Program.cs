@@ -11,7 +11,7 @@ class Program
         ArgumentParser.Run(args);
     }
 
-    public static void DisplayResults(Dictionary<string, double> pairsTask)
+    public static void DisplayResults(Dictionary<string, long> pairsTask)
     {
         double totalSize = 0;
 
@@ -22,26 +22,40 @@ class Program
                 .ToDictionary(x => x.Key, x => x.Value);
             foreach (var keyValuePair in orderedPairs)
             {
+                // convert byte to appropriate size
+                string size = Converter.ConvertFromBytes(keyValuePair.Value);
+                string name = keyValuePair.Key;
+                if (name.Length > 40)
+                {
+                    name = $"{name.Substring(0, 40)}...";
+                }
                 Writer.Write(
-                    $"{keyValuePair.Key,-45}\t{keyValuePair.Value}",
+                    $"{name,-45}\t{size}",
                     ConsoleColor.Yellow,
                     Config.prefersLightMode
                 );
 
-                totalSize += keyValuePair.Value;
+                totalSize += keyValuePair.Value /1024d /1024d/1024d;
             }
         }
         else
         {
             foreach (var keyValuePair in pairsTask)
             {
+             // convert byte to appropriate size
+                string size = Converter.ConvertFromBytes(keyValuePair.Value);
+                string name = keyValuePair.Key;
+                if (name.Length > 20)
+                {
+                    name = $"{name.Substring(0, 20)}...";
+                }
                 Writer.Write(
-                    $"{keyValuePair.Key,-45}\t{keyValuePair.Value}",
+                    $"{name,-45}\t{size}",
                     ConsoleColor.Yellow,
                     Config.prefersLightMode
                 );
 
-                totalSize += keyValuePair.Value;
+                totalSize += keyValuePair.Value /1024d /1024d/ 1024d;
             }
         }
 

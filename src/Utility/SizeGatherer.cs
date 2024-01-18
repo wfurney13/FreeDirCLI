@@ -7,7 +7,6 @@ namespace FreeDirCLI
     {
         public static int UnauthorizedAccessExceptionFileCount;
         public static string? filePath;
-        public static List<Dictionary<string, double>>? previousResults;
 
         public static void CheckForPathAndRun()
         {
@@ -74,10 +73,10 @@ namespace FreeDirCLI
             }
         }
 
-        public static Dictionary<string, double> GetSizeOfEachFolderForPath(string filePath)
+        public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)
         {
             //create dictionary for holding directory name and sizes
-            Dictionary<string, double> nameSizePairs = new();
+            Dictionary<string, long> nameSizePairs = new();
 
             //create instance of DirectoryInfo for file path provided
             DirectoryInfo dirInfo = new(filePath);
@@ -89,22 +88,14 @@ namespace FreeDirCLI
                 //try to get the dir size, if we dont have access to the dir just continue and let the user know
                 try
                 {
+
                     long dirSize = new FileInfoEnumerable(
-                        dir
-                    ).Sum(fileLength => fileLength);
+                      dir
+               ).Sum(file => file.Length);
 
                     //byte to GB coversion
-                    double GBDirSize = dirSize / 1024d / 1024d / 1024d;
-
-                    if (GBDirSize < 1)
-                    {
-                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 4));
-                    }
-                    else
-                    {
-                        nameSizePairs.Add(dir.Name, Math.Round(GBDirSize, 2));
-                    }
-                }
+                        nameSizePairs.Add(dir.Name, dirSize);
+                   }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {
                     Writer.Write(
@@ -115,10 +106,26 @@ namespace FreeDirCLI
                 }
             }
 
+            // try to enumerate files at the parent as well
+
+            try
+            {
+                var files = dirInfo.EnumerateFiles("*", SearchOption.TopDirectoryOnly);
+                foreach (var file in files)
+                {
+                    long fileSize = file.Length;
+                    nameSizePairs.Add(file.Name,fileSize);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                SizeGatherer.UnauthorizedAccessExceptionFileCount++;
+            }
+
             Writer.ClearLastLine();
 
             Writer.Write(
-                $"\n\n{"Directory Name",-45}\tDirectory Size (GB)\n",
+                $"\n\n{"Directory Name",-45}\tDirectory Size\n",
                 ConsoleColor.White,
                 Config.prefersLightMode
             );

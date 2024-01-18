@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace FreeDirCLI
 {
-    public class FileInfoEnumerable : IEnumerable<long>
+    public class FileInfoEnumerable : IEnumerable<FileInfo>
     {
         private readonly DirectoryInfo _root;
 
@@ -11,7 +11,7 @@ namespace FreeDirCLI
             _root = root;
         }
 
-        public IEnumerator<long> GetEnumerator()
+        public IEnumerator<FileInfo> GetEnumerator()
         {
             if (_root == null || !_root.Exists)
                 yield break;
@@ -40,13 +40,13 @@ namespace FreeDirCLI
             //return all the file matches
             foreach (var file in matches)
             {
-                yield return file.Length;
+                yield return file;
             }
 
             //return all the directory matches
             foreach (var dir in _root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
-                IEnumerable<long> fileInfosLengths = new FileInfoEnumerable(dir);
+                IEnumerable<FileInfo> fileInfosLengths = new FileInfoEnumerable(dir);
                 foreach (var fileLength in fileInfosLengths)
                 {
                     yield return fileLength;
