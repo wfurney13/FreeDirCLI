@@ -42,8 +42,6 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l C:\`
 
-![image](/screenshots/orderedlightmode.png)
-
 * Order by size descending (-o)
 
 `.\fd.exe -o`
@@ -52,7 +50,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l -o C:\`
 
-![image](/screenshots/drive.png)
+![image](/screenshots/orderedlightmode.png)
 
 * Show Drive info only (-d)
 
@@ -60,7 +58,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l -d`
 
-![image](https://i.ibb.co/ngSfj41/Screenshot-2024-01-11-173454.png)
+![image](/screenshots/drives.png)
 
 * Configuration (-config)
 
