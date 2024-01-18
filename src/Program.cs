@@ -35,7 +35,7 @@ class Program
                     Config.prefersLightMode
                 );
 
-                totalSize += keyValuePair.Value /1024d /1024d/1024d;
+                totalSize += keyValuePair.Value/1024d/1024d/1024d;
             }
         }
         else
@@ -48,9 +48,9 @@ class Program
              // convert byte to appropriate size
                 string size = Converter.ConvertFromBytes(keyValuePair.Value);
                 string name = keyValuePair.Key;
-                if (name.Length > 20)
+                if (name.Length > 40)
                 {
-                    name = $"{name.Substring(0, 20)}...";
+                    name = $"{name.Substring(0, 40)}...";
                 }
                 Writer.Write(
                     $"{name,-45}\t{size}",
@@ -58,7 +58,7 @@ class Program
                     Config.prefersLightMode
                 );
 
-                totalSize += keyValuePair.Value /1024d /1024d/ 1024d;
+                totalSize += keyValuePair.Value/1024d/1024d/1024d;
             }
         }
 
