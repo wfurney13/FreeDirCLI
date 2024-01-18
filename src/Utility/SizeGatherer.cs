@@ -119,8 +119,6 @@ namespace FreeDirCLI
                 SizeGatherer.UnauthorizedAccessExceptionFileCount++;
             }
 
-            Writer.ClearLastLine();
-
             Writer.Write(
                 $"\n\n{"Directory Name",-45}\tDirectory Size\n",
                 ConsoleColor.White,
