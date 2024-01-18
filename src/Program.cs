@@ -40,7 +40,10 @@ class Program
         }
         else
         {
-            foreach (var keyValuePair in pairsTask)
+            var defaultOrdering = pairsTask
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Value);
+            foreach (var keyValuePair in defaultOrdering)
             {
              // convert byte to appropriate size
                 string size = Converter.ConvertFromBytes(keyValuePair.Value);
@@ -59,22 +62,12 @@ class Program
             }
         }
 
-        if (totalSize > 1)
-        {
             Writer.Write(
                 $"\nUsed Space: {Math.Round(totalSize, 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
                 ConsoleColor.Red,
                 false
                 );
-        }
-        else
-        {
-            Writer.Write(
-                $"\nUsed Space: {Math.Round(totalSize, 4)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
-                ConsoleColor.Red,
-                false
-                );
-        }
+
 
         if (SizeGatherer.filePath != null)
         {

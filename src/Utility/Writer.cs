@@ -27,7 +27,7 @@ public class Writer
 
         while (consoleResponse == "")
         {
-            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+            WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
             consoleResponse = Console.ReadLine();
         }
 
@@ -67,11 +67,11 @@ public class Writer
                 )
                 {
                     SizeGatherer.filePath += $"{consoleResponse}";
-                    Writer.AddSlashToFilePath();
+                    AddSlashToFilePath();
                 }
                 else if (newPath == false)
                 {
-                    Writer.AddSlashToFilePath();
+                    AddSlashToFilePath();
                 }
 
                 if (SizeGatherer.filePath != null)
@@ -84,10 +84,10 @@ public class Writer
             }
             catch (Exception)
             {
-                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
                 TrimFilePathBackOneLevel();
                 Write($"{SizeGatherer.filePath}");
-                Writer.HandleReadLine(Console.ReadLine());
+                HandleReadLine(Console.ReadLine());
             }
         }
     }

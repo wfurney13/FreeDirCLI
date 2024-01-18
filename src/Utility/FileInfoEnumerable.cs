@@ -46,10 +46,10 @@ namespace FreeDirCLI
             //return all the directory matches
             foreach (var dir in _root.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
-                IEnumerable<FileInfo> fileInfosLengths = new FileInfoEnumerable(dir);
-                foreach (var fileLength in fileInfosLengths)
+                IEnumerable<FileInfo> fileInfo = new FileInfoEnumerable(dir);
+                foreach (var file in fileInfo)
                 {
-                    yield return fileLength;
+                    yield return file;
                 }
             }
         }
