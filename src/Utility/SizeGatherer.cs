@@ -1,6 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks.Dataflow;
-
 namespace FreeDirCLI
 {
     public class SizeGatherer
