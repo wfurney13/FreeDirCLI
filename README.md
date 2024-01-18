@@ -129,7 +129,7 @@ Restart powershell, then the program can be called with a simple
 
 -- Example for bash
 
-`vim ~/.bashrc`
+`vi ~/.bashrc`
 
 `export PATH=$PATH:/PATH_TO_REPO_BIN/Linux`
 
