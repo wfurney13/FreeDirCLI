@@ -1,6 +1,6 @@
 <h1>FreeDirCLI</h1>
 
-![image](https://i.ibb.co/k0RM9f3/Screenshot-2024-01-07-152010.png)
+![image](/screenshots/regular.png)
 
 <h2>Usage</h2>
 
@@ -42,7 +42,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l C:\`
 
-![image](https://i.ibb.co/GtsY17S/Screenshot-2024-01-11-173408.png)
+![image](/screenshots/orderedlightmode.png)
 
 * Order by size descending (-o)
 
@@ -52,7 +52,7 @@ This will get the names of the subdirectories at that path, add up their file si
 
 `.\fd.exe -l -o C:\`
 
-![image](https://i.ibb.co/B60k6Nh/Screenshot-2024-01-11-173428.png)
+![image](/screenshots/drive.png)
 
 * Show Drive info only (-d)
 
