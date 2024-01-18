@@ -32,7 +32,7 @@ As this tool is a CLI, it is designed to run from the command line. All of the b
 
 `.\fd.exe 'C:\Program Files (x86)\'`
 
-This will get thed names of the subdirectories at that path, add up their file sizes, and return the name and sum. When no file path is provided as an argument, this tool will scan all of your drives, sum up the file sizes of each directory, and return the results. Then you can continue by typing the name of the next folder, file path, or :b to go to the parent folder.
+This will get the names of the subdirectories at that path, add up their file sizes, and return the name and sum. When no file path is provided as an argument, this tool will scan all of your drives, sum up the file sizes of each directory, and return the results. Then you can continue by typing the name of the next folder, file path, or :b to go to the parent folder.
 
 ![image](/screenshots/nextfolder.png)
 
