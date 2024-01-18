@@ -78,17 +78,19 @@ class Program
             );
         }
 
-        if (!userContinued)
-        {
-            Writer.Write(
-                $"(:q to quit, :b to go back)",
-                ConsoleColor.Green,
-                Config.prefersLightMode
-            );
-        }
+
 
         if (!Config.allDisks)
         {
+            if (!userContinued )
+            {
+                Writer.Write(
+                    $"(:q to quit, :b to go back)",
+                    ConsoleColor.Green,
+                    Config.prefersLightMode
+                    );
+            }
+            
             Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
             Writer.HandleReadLine(Console.ReadLine());
         }
