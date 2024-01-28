@@ -1,3 +1,5 @@
+using FreeDirCLI.Utility;
+
 namespace FreeDirCLI
 {
     public class SizeGatherer
@@ -72,6 +74,11 @@ namespace FreeDirCLI
 
         public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)
         {
+            if (Program.userContinued == false)
+            {
+                Program.DirectoryNames = new();
+            }
+
             //create dictionary for holding directory name and sizes
             Dictionary<string, long> nameSizePairs = new();
 
@@ -85,14 +92,13 @@ namespace FreeDirCLI
                 //try to get the dir size, if we dont have access to the dir just continue and let the user know
                 try
                 {
-
                     long dirSize = new FileInfoEnumerable(
-                      dir
-               ).Sum(file => file.Length);
+                        dir
+                    ).Sum(file => file.Length);
 
                     //byte to GB coversion
-                        nameSizePairs.Add(dir.Name, dirSize);
-                   }
+                    nameSizePairs.Add(dir.Name, dirSize);
+                }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {
                     Writer.Write(
@@ -111,7 +117,7 @@ namespace FreeDirCLI
                 foreach (var file in files)
                 {
                     long fileSize = file.Length;
-                    nameSizePairs.Add(file.Name,fileSize);
+                    nameSizePairs.Add(file.Name, fileSize);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -135,6 +141,9 @@ namespace FreeDirCLI
             try
             {
                 IEnumerable<DirectoryInfo> directories = directoryInfo.EnumerateDirectories();
+                List<string> dnames = new();
+
+
                 return directories;
             }
             catch (DirectoryNotFoundException)
@@ -144,8 +153,13 @@ namespace FreeDirCLI
                     ConsoleColor.Red,
                     false
                 );
+                FilePathWorker.TrimFilePathBackOneLevel();
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                Readline.Read(Console.ReadLine());
+                Environment.Exit(0);
                 throw;
             }
         }
     }
 }
+
