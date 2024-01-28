@@ -14,8 +14,7 @@ public class Readline
         {
             while (consoleResponse == "")
             {
-                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
-                consoleResponse = Console.ReadLine();
+                Readline.ReadKey(Console.ReadKey(intercept: true));
             }
         }
 
@@ -25,7 +24,7 @@ public class Readline
             Environment.Exit(0);
         }
 
-        if (consoleResponse.ToLower() == ":b" || consoleResponse.ToLower() == "back")
+        if (consoleResponse != null && (consoleResponse.ToLower() == ":b" || consoleResponse.ToLower() == "back"))
         {
             FilePathWorker.TrimFilePathBackOneLevel();
         }
@@ -77,17 +76,123 @@ public class Readline
     {
         while (keyPressed.Key != ConsoleKey.Enter)
         {
-            if (keyPressed.Key == ConsoleKey.DownArrow)
-            {
-                Console.WriteLine("Down Arrow Pressed");
-            }
-
-            else if (keyPressed.Key == ConsoleKey.Backspace)
+            if (keyPressed.Key == ConsoleKey.Backspace)
             {
                 if (sb.Length > 0)
                 {
                     sb.Remove(sb.Length - 1, 1);
                     Writer.WriteInline("\b \b");
+                }
+            }
+            //arrow keys
+            else if (keyPressed.Key == ConsoleKey.LeftArrow)
+            {
+                sb.Remove(0, sb.Length);
+                Read(":b");
+            }
+            else if (keyPressed.Key == ConsoleKey.RightArrow)
+            {
+                ConsoleKeyInfo enterKey = new('\u0000', ConsoleKey.Enter, false, false, false);
+                ReadKey(enterKey);
+            }
+
+            else if (keyPressed.Key == ConsoleKey.UpArrow)
+            {
+                string builtString = sb.ToString();
+                if (builtString.Length > 0)
+                {
+                    //if there is no direct match, find the closet match for the string (press tab)
+                    foreach (var name in Program.DirectoryNames)
+                    {
+                        if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
+                        {
+                            ConsoleKeyInfo tabKey = new('\u0000', ConsoleKey.Tab, false, false, false);
+                            ReadKey(tabKey);
+                        }
+                        //if there is a direct match, go "up" to the previous result. If there is a direct match and no previous result, go "up" to the last result
+                        else if (name.ToUpper() == builtString.ToUpper())
+                        {
+                            //remove the current input
+                            for (int x = 0; x < builtString.Length; x++)
+                            {
+                                if (sb.Length > 0)
+                                {
+                                    sb.Remove(sb.Length - 1, 1);
+                                    Writer.WriteInline("\b \b");
+                                }
+                            }
+
+                            builtString = name;
+                        }
+                    }
+
+                    if (Program.DirectoryNames.Contains(builtString))
+                    {
+                        int index = Program.DirectoryNames.FindIndex(x => x.StartsWith(builtString));
+                        //top of the list, go to the bottom
+                        if (index != 0)
+                        {
+                            index = index - 1;
+                        }
+
+                        Writer.WriteInline(Program.DirectoryNames[index]);
+                        sb.Append(Program.DirectoryNames[index]);
+                    }
+                }
+                else // there is no string and they hit up arrow, start at bottom of the list
+                {
+                    Writer.WriteInline(Program.DirectoryNames[^1]);
+                    sb.Append(Program.DirectoryNames[^1]);
+                }
+            }
+
+            else if (keyPressed.Key == ConsoleKey.DownArrow)
+            {
+                string builtString = sb.ToString();
+                if (builtString.Length > 0)
+                {
+                    //if there is no direct match, find the closet match for the string (press tab)
+                    foreach (var name in Program.DirectoryNames)
+                    {
+                        if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
+                        {
+                            ConsoleKeyInfo tabKey = new('\u0000', ConsoleKey.Tab, false, false, false);
+                            ReadKey(tabKey);
+                        }
+                        //if there is a direct match, go "up" to the previous result. If there is a direct match and no previous result, go "up" to the last result
+                        else if (name.ToUpper() == builtString.ToUpper())
+                        {
+                            //remove the current input
+                            for (int x = 0; x < builtString.Length; x++)
+                            {
+                                if (sb.Length > 0)
+                                {
+                                    sb.Remove(sb.Length - 1, 1);
+                                    Writer.WriteInline("\b \b");
+                                }
+                            }
+
+                            builtString = name;
+                        }
+                    }
+
+                    if (Program.DirectoryNames.Contains(builtString))
+                    {
+                        int index = Program.DirectoryNames.FindIndex(x => x.StartsWith(builtString));
+                        //top of the list, go to the bottom
+                        if (index != Program.DirectoryNames.Count - 1)
+                        {
+                            index = index + 1;
+                        }
+
+                        Writer.WriteInline(Program.DirectoryNames[index]);
+                        sb.Append(Program.DirectoryNames[index]);
+                    }
+                }
+                else // there is no string and they hit up arrow, start at bottom of the list
+                {
+                    Writer.WriteInline(Program.DirectoryNames[0]);
+                    sb.Append(Program.DirectoryNames[0]);
                 }
             }
             //tab completion (first match)
@@ -110,6 +215,19 @@ public class Readline
                         sb.Append(name);
                         Writer.WriteInline(name);
                         break;
+                    }
+                }
+            }
+            else if (keyPressed.Key == ConsoleKey.Escape)
+            {
+                string builtString = sb.ToString();
+                //remove the current input
+                for (int x = 0; x < builtString.Length; x++)
+                {
+                    if (builtString.Length > 0)
+                    {
+                        sb.Remove(sb.Length - 1, 1);
+                        Writer.WriteInline("\b \b");
                     }
                 }
             }

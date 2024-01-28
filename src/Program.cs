@@ -6,7 +6,7 @@ class Program
 {
     public static bool userContinued;
     public static DriveInfo[]? drives;
-    public static List<string> DirectoryNames;
+    public static List<string?> DirectoryNames;
 
     static void Main(string[] args)
     {
@@ -16,7 +16,7 @@ class Program
 
     static void StoreResults(Dictionary<string, long> results)
     {
-	DirectoryNames.Clear();
+        DirectoryNames.Clear();
         var ResultsDict = results.Keys.ToList();
 
         foreach (var result in ResultsDict)
@@ -48,28 +48,27 @@ class Program
     }
 
 
-    public static void DisplayResults(Dictionary<string, long> pairsTask)
+    public static void DisplayResults(Dictionary<string, long> pairs)
     {
-        StoreResults(pairsTask);
         double totalSize = 0;
-
-        Dictionary<string, long> Pairs = new();
 
         if (Config.orderedOutput)
         {
-            Pairs = pairsTask
+            pairs = pairs
                 .OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
         if (!Config.orderedOutput)
         {
-            Pairs = pairsTask
+            pairs = pairs
                 .OrderBy(x => x.Key)
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
-        foreach (var keyValuePair in Pairs)
+        StoreResults(pairs);
+
+        foreach (var keyValuePair in pairs)
         {
             WritePair(keyValuePair);
             // convert byte to appropriate size
