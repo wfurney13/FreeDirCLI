@@ -1,2 +1,0 @@
-S:\bin\FreeDirCLI\FreeDirCLI.pdb
-S:\bin\FreeDirCLI\FreeDirCLI.exe
