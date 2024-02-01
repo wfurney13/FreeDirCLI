@@ -1,21 +1,24 @@
 using FreeDirCLI.Utility;
+using System.Diagnostics;
 
 namespace FreeDirCLI
 {
     public class SizeGatherer
     {
         public static int UnauthorizedAccessExceptionFileCount;
-        public static string? filePath;
+        public static List<string>? UnauthorizedFileList;
+        public static string? FilePath;
 
         public static void CheckForPathAndRun()
         {
-            if (filePath == null) // when there is no file path passed in we want to run for all folders
+            if (FilePath == null) // when there is no file path passed in we want to run for all folders
             {
                 GetSizeOfAllFolders();
             }
             else // otherwise use the file path that was passed in
             {
-                var nameAndSizePairs = GetSizeOfEachFolderForPath(filePath);
+                Debug.Assert(FilePath != null);
+                var nameAndSizePairs = GetSizeOfEachFolderForPath(FilePath);
                 Program.DisplayResults(nameAndSizePairs);
             }
         }
@@ -44,7 +47,10 @@ namespace FreeDirCLI
                         Config.allDisks = true;
                         break;
                     default:
-                        Writer.DisplayHelpMessage();
+                        //Writer.DisplayHelpMessage();
+                        Writer.Write("Enter File Path to Search:");
+                        Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                        Readline.Read(Console.ReadLine());
                         return;
                 }
             }
@@ -77,7 +83,12 @@ namespace FreeDirCLI
             if (Program.userContinued == false)
             {
                 Program.DirectoryNames = new();
+                UnauthorizedFileList = new();
             }
+
+            Debug.Assert(UnauthorizedFileList != null);
+            UnauthorizedFileList.Clear();
+            UnauthorizedAccessExceptionFileCount = 0;
 
             //create dictionary for holding directory name and sizes
             Dictionary<string, long> nameSizePairs = new();
@@ -153,7 +164,7 @@ namespace FreeDirCLI
                     ConsoleColor.Red,
                     false
                 );
-                FilePathWorker.TrimFilePathBackOneLevel();
+                FilePathModifier.TrimFilePathBackOneLevel();
                 Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
                 Readline.Read(Console.ReadLine());
                 Environment.Exit(0);

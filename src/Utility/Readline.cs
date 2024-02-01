@@ -1,4 +1,5 @@
-using System.Text;
+﻿using System.Text;
+using System.Diagnostics;
 
 namespace FreeDirCLI.Utility;
 
@@ -8,29 +9,56 @@ public class Readline
 
     public static void Read(string? consoleResponse)
     {
+        Writer.Write("\n");
         bool newPath = false;
 
         if (consoleResponse == "")
         {
             while (consoleResponse == "")
             {
-                Readline.ReadKey(Console.ReadKey(intercept: true));
+                ReadKey(Console.ReadKey(intercept: true));
+            }
+        }
+        Debug.Assert(consoleResponse != null);
+        if (consoleResponse.StartsWith(":"))
+        {
+            if (consoleResponse == ":q")
+            {
+                Environment.Exit(0);
+            }
+            if (consoleResponse == ":which")
+            {
+                Debug.Assert(SizeGatherer.UnauthorizedFileList != null);
+            foreach (var file in SizeGatherer.UnauthorizedFileList)
+            {
+                Writer.Write($"\n{file}");
+            }
+            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+            ReadKey(Console.ReadKey(intercept: true));
+            }
+
+            if (consoleResponse == ":b")
+            {
+
+                FilePathModifier.TrimFilePathBackOneLevel();
+
+                Program.userContinued = true;
+
+                Debug.Assert(SizeGatherer.FilePath != null);
+
+                var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
+                        SizeGatherer.FilePath
+                        );
+                Program.DisplayResults(nameAndSizePairs);
             }
         }
 
 
-        if (consoleResponse == ":q")
+        else
         {
-            Environment.Exit(0);
-        }
+          
+            Debug.Assert(Program.DirectoryNames != null);
 
-        if (consoleResponse != null && (consoleResponse.ToLower() == ":b" || consoleResponse.ToLower() == "back"))
-        {
-            FilePathWorker.TrimFilePathBackOneLevel();
-        }
-
-        else if (consoleResponse != null)
-        {
             if (Program.drives != null)
             {
                 //if the user passes in a new file path starting with one of their drives we know its a whole new path
@@ -38,37 +66,38 @@ public class Readline
                 {
                     if (consoleResponse.ToUpper().StartsWith(drive.ToString().ToUpper()))
                     {
-                        SizeGatherer.filePath = consoleResponse;
+                        SizeGatherer.FilePath = consoleResponse;
                         newPath = true;
                     }
                 }
             }
 
-            //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
+            Debug.Assert(SizeGatherer.FilePath != null);
+                //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
             if (
-                SizeGatherer.filePath != null
-                && SizeGatherer.filePath.EndsWith($"{Config.slashType}")
+                SizeGatherer.FilePath.EndsWith($"{Config.slashType}")
                 && newPath == false
-            )
+                )
             {
-                SizeGatherer.filePath += $"{consoleResponse}";
-                FilePathWorker.AddSlashToFilePath();
+                SizeGatherer.FilePath += $"{consoleResponse}";
+                SizeGatherer.FilePath += Config.slashType;
             }
 
-            if (newPath == false)
+             if (!SizeGatherer.FilePath.EndsWith($"{Config.slashType}")
+                && newPath == false
+                )
             {
-                FilePathWorker.AddSlashToFilePath();
+                SizeGatherer.FilePath += Config.slashType;
+                SizeGatherer.FilePath += $"{consoleResponse}";
+                SizeGatherer.FilePath += Config.slashType;
             }
-        }
 
-        Program.userContinued = true;
+            Program.userContinued = true;
 
-        if (SizeGatherer.filePath != null)
-        {
             var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
-                SizeGatherer.filePath
-            );
-            Program.DisplayResults(nameAndSizePairs);
+                    SizeGatherer.FilePath
+                    );
+                Program.DisplayResults(nameAndSizePairs);
         }
     }
 
@@ -102,6 +131,7 @@ public class Readline
                 if (builtString.Length > 0)
                 {
                     //if there is no direct match, find the closet match for the string (press tab)
+                    Debug.Assert(Program.DirectoryNames != null);
                     foreach (var name in Program.DirectoryNames)
                     {
                         if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
@@ -141,6 +171,7 @@ public class Readline
                 }
                 else // there is no string and they hit up arrow, start at bottom of the list
                 {
+                    Debug.Assert(Program.DirectoryNames != null);
                     Writer.WriteInline(Program.DirectoryNames[^1]);
                     sb.Append(Program.DirectoryNames[^1]);
                 }
@@ -152,6 +183,7 @@ public class Readline
                 if (builtString.Length > 0)
                 {
                     //if there is no direct match, find the closet match for the string (press tab)
+                    Debug.Assert(Program.DirectoryNames != null);
                     foreach (var name in Program.DirectoryNames)
                     {
                         if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
@@ -191,6 +223,7 @@ public class Readline
                 }
                 else // there is no string and they hit up arrow, start at bottom of the list
                 {
+                    Debug.Assert(Program.DirectoryNames != null);
                     Writer.WriteInline(Program.DirectoryNames[0]);
                     sb.Append(Program.DirectoryNames[0]);
                 }
@@ -199,6 +232,9 @@ public class Readline
             else if (keyPressed.Key == ConsoleKey.Tab)
             {
                 string builtString = sb.ToString();
+
+                Debug.Assert(Program.DirectoryNames != null);
+
                 foreach (string name in Program.DirectoryNames)
                 {
                     if (name.ToUpper().StartsWith(builtString.ToUpper()))
@@ -242,9 +278,18 @@ public class Readline
 
         if (keyPressed.Key == ConsoleKey.Enter)
         {
-            var builtString = sb.ToString();
-            sb.Remove(0, sb.Length);
-            Read(builtString);
+            if (sb.Length > 0)
+            {
+                var builtString = sb.ToString();
+                sb.Clear();
+                Read(builtString);
+            }
+            else
+            {
+                ReadKey(Console.ReadKey(intercept: true)); 
+            }
         }
     }
+
+
 }

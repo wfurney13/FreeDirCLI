@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FreeDirCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "S:\\"
+    }
+  }
+}

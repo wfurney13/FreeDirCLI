@@ -1,4 +1,7 @@
 ﻿using FreeDirCLI.Utility;
+using System.Diagnostics;
+using System.Drawing;
+using System.Xml.Linq;
 
 namespace FreeDirCLI;
 
@@ -6,28 +9,74 @@ class Program
 {
     public static bool userContinued;
     public static DriveInfo[]? drives;
-    public static List<string?> DirectoryNames;
+    public static List<string>? DirectoryNames;
 
     static void Main(string[] args)
     {
         drives = DriveInfo.GetDrives();
-        ArgumentParser.Run(args);
+        Config.GetSlashType();
+        Config.CheckConfig(
+              args); // Does the user have a config file already setup. If so use the information in the file. Unless they passed in '-config' again, then give them the option to recreate it
+
+        if (args.Contains("-d"))
+        {
+            Config.diskSizesOnly = true;
+        }
+
+        if (args.Contains("-h") || args.Contains("-help"))
+        {
+            Writer.DisplayHelpMessage();
+        }
+        else
+        {
+            ParseArgsAndSetFilePath(args);
+            SizeGatherer.CheckForPathAndRun();
+        }
+    }
+
+    static void ParseArgsAndSetFilePath(string[] args)
+    {
+        Debug.Assert(Config.slashType != null);
+
+        if (args.Length == 1)
+        {
+            if (!args[0].StartsWith(
+                    "-")) // if there is only one argument and it is not -*. It should be a file path
+            {
+                SizeGatherer.FilePath = args[0];
+            }
+        }
+
+        if (args.Length == 2)
+        {
+            if (!args[1].StartsWith("-")) // ensure args[1] is not a switch (and thus should be a file path)
+            {
+                SizeGatherer.FilePath = args[1];
+            }
+        }
+
+        Debug.Assert(SizeGatherer.FilePath != null);
+
+        if (!SizeGatherer.FilePath.EndsWith(Config.slashType))
+        {
+            SizeGatherer.FilePath += Config.slashType;
+        }
     }
 
     static void StoreResults(Dictionary<string, long> results)
     {
-        DirectoryNames.Clear();
-        var ResultsDict = results.Keys.ToList();
+        Debug.Assert(DirectoryNames is not null);
 
-        foreach (var result in ResultsDict)
+        if (DirectoryNames.Any())
         {
-            DirectoryNames.Add(result);
+            DirectoryNames.Clear();
         }
 
+        var resultsDict = results.Keys.ToList();
 
-        if (results.Count > 1000)
+        foreach (var result in resultsDict)
         {
-            throw new NotImplementedException();
+            DirectoryNames.Add(result);
         }
     }
 
@@ -68,6 +117,21 @@ class Program
 
         StoreResults(pairs);
 
+        for (int x = Console.CursorTop; x > 0; x--)
+        {
+            Console.SetCursorPosition(0, x);
+            Console.Write(new string(' ', Console.BufferWidth));
+        }
+
+        Writer.Write(
+            $"{"Directory Name",-45}\tDirectory Size",
+            ConsoleColor.Yellow,
+            Config.prefersLightMode
+        );
+        Writer.Write($"{"——————————————",-45}\t——————————————", ConsoleColor.Yellow,Config.prefersLightMode);
+
+
+
         foreach (var keyValuePair in pairs)
         {
             WritePair(keyValuePair);
@@ -75,17 +139,23 @@ class Program
             totalSize += keyValuePair.Value / 1024d / 1024d / 1024d;
         }
 
-        Writer.Write(
-            $"\nUsed Space: {Math.Round(totalSize
-                , 2)} GB\n\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\n",
-            ConsoleColor.Red,
-            false
-        );
+        Writer.Write($"\nUsed Space: {Math.Round(totalSize
+                    , 2)} GB",ConsoleColor.Red, false);
 
-        if (SizeGatherer.filePath != null)
+
+        if (SizeGatherer.UnauthorizedAccessExceptionFileCount > 0)
         {
             Writer.Write(
-                $"{SizeGatherer.filePath.ToUpper()}",
+                $"\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\nUse command :which to see list of files that cannot be accessed.",
+                ConsoleColor.Red,
+                false
+            );
+        }
+
+        if (SizeGatherer.FilePath != null)
+        {
+            Writer.Write(
+                $"\n{SizeGatherer.FilePath.ToUpper()}",
                 ConsoleColor.Green,
                 Config.prefersLightMode
             );

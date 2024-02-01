@@ -89,8 +89,11 @@ class Config
         {
             case "y":
                 CreateConfigFile();
+                Environment.Exit(0);
                 break;
             default:
+                Writer.DisplayHelpMessage();
+                Environment.Exit(0);
                 break;
         }
     }

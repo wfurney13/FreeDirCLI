@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FreeDirCLI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f4afd15c61e3b91f01eb2fac93c6138bf41354b8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88812bf57985032aac8a637475cbcfc60c20b142")]
 [assembly: System.Reflection.AssemblyProductAttribute("FreeDirCLI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FreeDirCLI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
