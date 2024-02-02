@@ -7,20 +7,20 @@ namespace FreeDirCLI;
 
 class Program
 {
-    public static bool userContinued;
-    public static DriveInfo[]? drives;
+    public static bool UserContinued;
+    public static DriveInfo[]? Drives;
     public static List<string>? StoredResults;
 
     static void Main(string[] args)
     {
-        drives = DriveInfo.GetDrives();
+        Drives = DriveInfo.GetDrives();
         Config.GetSlashType();
         Config.CheckConfig(
               args); // Does the user have a config file already setup. If so use the information in the file. Unless they passed in '-config' again, then give them the option to recreate it
 
         if (args.Contains("-d"))
         {
-            Config.diskSizesOnly = true;
+            Config.DiskSizesOnly = true;
         }
 
         if (args.Contains("-h") || args.Contains("-help"))
@@ -29,6 +29,7 @@ class Program
         }
         else
         {
+
             ParseArgsAndSetFilePath(args);
             SizeGatherer.CheckForPathAndRun();
         }
@@ -36,8 +37,6 @@ class Program
 
     static void ParseArgsAndSetFilePath(string[] args)
     {
-        Debug.Assert(Config.slashType != null);
-
         if (args.Length == 1)
         {
             if (!args[0].StartsWith(
@@ -54,6 +53,7 @@ class Program
                 SizeGatherer.FilePath = args[1];
             }
         }
+
     }
 
     static void StoreResults(Dictionary<string, long> results)
@@ -85,7 +85,7 @@ class Program
         Writer.Write(
             $"{name,-45}\t{size}",
             ConsoleColor.Yellow,
-            Config.prefersLightMode
+            Config.PrefersLightMode
         );
     }
 
@@ -94,14 +94,14 @@ class Program
     {
         double totalSize = 0;
 
-        if (Config.orderedOutput)
+        if (Config.OrderedOutput)
         {
             pairs = pairs
                 .OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
-        if (!Config.orderedOutput)
+        if (!Config.OrderedOutput)
         {
             pairs = pairs
                 .OrderBy(x => x.Key)
@@ -110,18 +110,20 @@ class Program
 
         StoreResults(pairs);
 
-        for (int x = Console.CursorTop; x > 0; x--)
+        if (!SizeGatherer.AllDrives)
         {
-            Console.SetCursorPosition(0, x);
-            Console.Write(new string(' ', Console.BufferWidth));
+            for (int x = Console.CursorTop; x > 0; x--)
+            {
+                Console.SetCursorPosition(0, x);
+                Console.Write(new string(' ', Console.BufferWidth));
+            }
         }
-
         Writer.Write(
             $"{"Directory Name",-45}\tDirectory Size",
             ConsoleColor.Yellow,
-            Config.prefersLightMode
+            Config.PrefersLightMode
         );
-        Writer.Write($"{"——————————————",-45}\t——————————————", ConsoleColor.Yellow,Config.prefersLightMode);
+        Writer.Write($"{"——————————————",-45}\t——————————————", ConsoleColor.Yellow,Config.PrefersLightMode);
 
 
 
@@ -136,7 +138,7 @@ class Program
                     , 2)} GB",ConsoleColor.Red, false);
 
 
-        if (SizeGatherer.UnauthorizedAccessExceptionFileCount > 0)
+        if (SizeGatherer.UnauthorizedAccessExceptionFileCount > 0 && !SizeGatherer.AllDrives)
         {
             Writer.Write(
                 $"\nCannot access {SizeGatherer.UnauthorizedAccessExceptionFileCount} files\nUse command :which to see list of files that cannot be accessed.",
@@ -150,23 +152,23 @@ class Program
             Writer.Write(
                 $"\n{SizeGatherer.FilePath.ToUpper()}",
                 ConsoleColor.Green,
-                Config.prefersLightMode
+                Config.PrefersLightMode
             );
         }
 
 
-        if (!Config.allDisks)
+        if (!SizeGatherer.AllDrives)
         {
-            if (!userContinued)
+            if (!UserContinued)
             {
                 Writer.Write(
                     $"(:q to quit, :b to go back)",
                     ConsoleColor.Green,
-                    Config.prefersLightMode
+                    Config.PrefersLightMode
                 );
             }
 
-            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+            Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
             Readline.ReadKey(Console.ReadKey(intercept: true));
         }
     }

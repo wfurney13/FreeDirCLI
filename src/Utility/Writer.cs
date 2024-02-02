@@ -4,7 +4,7 @@ public class Writer
 {
     public static void Write(string message, ConsoleColor color, bool lightMode)
     {
-        if (Config.prefersLightMode == false)
+        if (Config.PrefersLightMode == false)
         {
             Console.ForegroundColor = color;
             Console.WriteLine(message);
@@ -24,7 +24,7 @@ public class Writer
 
     public static void WriteInline(string message, ConsoleColor color, bool lightMode)
     {
-        if (Config.prefersLightMode == false)
+        if (Config.PrefersLightMode == false)
         {
             Console.ForegroundColor = color;
             Console.Write(message);

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace FreeDirCLI.Utility;
 
@@ -33,7 +34,7 @@ public class Readline
             {
                 Writer.Write($"\n{file}");
             }
-            Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+            Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
             ReadKey(Console.ReadKey(intercept: true));
             }
 
@@ -42,7 +43,7 @@ public class Readline
 
                 FilePathModifier.TrimFilePathBackOneLevel();
 
-                Program.userContinued = true;
+                Program.UserContinued = true;
 
                 Debug.Assert(SizeGatherer.FilePath != null);
 
@@ -59,40 +60,51 @@ public class Readline
           
             Debug.Assert(Program.StoredResults != null);
 
-            if (Program.drives != null)
+            if (Program.Drives != null)
             {
                 //if the user passes in a new file path starting with one of their drives we know its a whole new path
-                foreach (var drive in Program.drives)
+                foreach (var drive in Program.Drives)
                 {
-                    if (consoleResponse.ToUpper().StartsWith(drive.ToString().ToUpper()))
+                    if (!Program.StoredResults.Contains(consoleResponse)
+                        && consoleResponse.ToUpper()[0] == drive.ToString().ToUpper()[0]) // This would catch things like C: and C as drives and eventually ValidateFilePath will convert it to C:\
                     {
                         SizeGatherer.FilePath = consoleResponse;
                         newPath = true;
                     }
+
                 }
+            }
+
+            if (SizeGatherer.FilePath == null) 
+            {
+                Writer.Write(
+                    "Provided file path is invalid. Enter a valid file path. For example, C:\\\n",
+                    ConsoleColor.Red,
+                    false
+                );
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
+                Readline.ReadKey(Console.ReadKey(intercept: true));
             }
 
             Debug.Assert(SizeGatherer.FilePath != null);
                 //else assume what is passed to the consoleResponse will be a partial file path that is one of the options displayed in the results try it as a full file path as well if it errors
             if (
-                SizeGatherer.FilePath.EndsWith($"{Config.slashType}")
+                SizeGatherer.FilePath.EndsWith($"{Config.SlashType}")
                 && newPath == false
                 )
             {
-                SizeGatherer.FilePath += $"{consoleResponse}";
-                SizeGatherer.FilePath += Config.slashType;
-            }
+                SizeGatherer.FilePath += $"{consoleResponse}{Config.SlashType}";            }
 
-             if (!SizeGatherer.FilePath.EndsWith($"{Config.slashType}")
+             if (!SizeGatherer.FilePath.EndsWith($"{Config.SlashType}")
                 && newPath == false
                 )
             {
-                SizeGatherer.FilePath += Config.slashType;
-                SizeGatherer.FilePath += $"{consoleResponse}";
-                SizeGatherer.FilePath += Config.slashType;
+                SizeGatherer.FilePath += $"{Config.SlashType}{consoleResponse}{Config.SlashType}";
             }
 
-            Program.userContinued = true;
+            Program.UserContinued = true;
+
+            FilePathModifier.ValidatePath();
 
             var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
                     SizeGatherer.FilePath
