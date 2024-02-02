@@ -7,8 +7,6 @@ public class FilePathModifier
 {
     public static void TrimFilePathBackOneLevel()
     {
-        ValidatePath();
-
         Debug.Assert(SizeGatherer.FilePath != null);
         if (SizeGatherer.FilePath.Length == 3 &&
             SizeGatherer.FilePath.EndsWith($"{Config.SlashType}"))
@@ -34,6 +32,8 @@ public class FilePathModifier
                     );
                 }
             }
+
+            ValidatePath();
         }
 
         
@@ -90,7 +90,24 @@ public class FilePathModifier
         {
             SizeGatherer.FilePath += Config.SlashType;
         }
+
     }
 
+    public static void InvalidPathResponse()
+    {
+        Writer.Write(
+                    $"Provided file path ({SizeGatherer.FilePath}) is invalid\n",
+                    ConsoleColor.Red,
+                    false
+                );
+        if (SizeGatherer.FilePath != null)
+        {
+            TrimFilePathBackOneLevel();
+        }
+        Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
+        Readline.ReadKey(Console.ReadKey(intercept: true));
+    }
+
+    
 
 }

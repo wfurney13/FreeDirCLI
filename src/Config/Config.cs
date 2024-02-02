@@ -7,7 +7,6 @@ class Config
     public static bool PrefersLightMode;
     public static bool DiskSizesOnly;
     public static bool OrderedOutput;
-    public static bool AllDisks;
     public static string? SlashType;
 
     static void CreateConfigFile()

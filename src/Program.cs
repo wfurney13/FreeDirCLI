@@ -89,11 +89,12 @@ class Program
         );
     }
 
-    
+
     public static void DisplayResults(Dictionary<string, long> pairs)
     {
-        double totalSize = 0;
-
+        long totalSize = 0;
+        if (pairs.Count > 0)
+        {
         if (Config.OrderedOutput)
         {
             pairs = pairs
@@ -123,7 +124,7 @@ class Program
             ConsoleColor.Yellow,
             Config.PrefersLightMode
         );
-        Writer.Write($"{"——————————————",-45}\t——————————————", ConsoleColor.Yellow,Config.PrefersLightMode);
+        Writer.Write($"{"——————————————",-45}\t——————————————", ConsoleColor.Yellow, Config.PrefersLightMode);
 
 
 
@@ -131,12 +132,10 @@ class Program
         {
             WritePair(keyValuePair);
             // convert byte to appropriate size
-            totalSize += keyValuePair.Value / 1024d / 1024d / 1024d;
+            totalSize += keyValuePair.Value;
         }
 
-        Writer.Write($"\nUsed Space: {Math.Round(totalSize
-                    , 2)} GB",ConsoleColor.Red, false);
-
+        Writer.Write($"\nUsed Space: {Converter.ConvertFromBytes(totalSize)}", ConsoleColor.Red, false);
 
         if (SizeGatherer.UnauthorizedAccessExceptionFileCount > 0 && !SizeGatherer.AllDrives)
         {
@@ -168,9 +167,31 @@ class Program
                 );
             }
 
-            Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
-            Readline.ReadKey(Console.ReadKey(intercept: true));
+            UserContinuing();
         }
+    }
+        else 
+        {
+            Writer.Write("No files found for path. Enter valid file path.",ConsoleColor.Red, false);
+            FilePathModifier.TrimFilePathBackOneLevel();
+        }
+
+        UserContinuing();
+    }
+
+    public static void UserContinuing()
+    {
+        if (StoredResults == null || SizeGatherer.AllDrives)
+        {
+            StoredResults = new();
+        }
+
+        if (SizeGatherer.UnauthorizedFileList == null || SizeGatherer.AllDrives)
+        {
+            SizeGatherer.UnauthorizedFileList = new();
+        }
+        Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
+        Readline.ReadKey(Console.ReadKey(intercept: true));
     }
 }
 
