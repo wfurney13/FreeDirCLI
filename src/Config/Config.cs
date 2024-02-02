@@ -2,13 +2,13 @@ namespace FreeDirCLI;
 
 class Config
 {
-    public static string? configPath;
-    public static string? configDirectory;
-    public static bool prefersLightMode;
-    public static bool diskSizesOnly;
-    public static bool orderedOutput;
-    public static bool allDisks;
-    public static string? slashType;
+    private static string? configPath;
+    private static string? configDirectory;
+    public static bool PrefersLightMode;
+    public static bool DiskSizesOnly;
+    public static bool OrderedOutput;
+    public static bool AllDisks;
+    public static string? SlashType;
 
     static void CreateConfigFile()
     {
@@ -140,16 +140,16 @@ class Config
             switch (line)
             {
                 case "prefersLightMode = 1":
-                    prefersLightMode = true;
+                    PrefersLightMode = true;
                     break;
                 case "prefersLightMode = 0":
-                    prefersLightMode = false;
+                    PrefersLightMode = false;
                     break;
                 case "orderedOutput = 1":
-                    orderedOutput = true;
+                    OrderedOutput = true;
                     break;
                 case "orderedOutput = 0":
-                    orderedOutput = false;
+                    OrderedOutput = false;
                     break;
             }
         }
@@ -187,11 +187,11 @@ class Config
     {
         if (OperatingSystem.IsWindows())
         {
-            slashType = "\\";
+            SlashType = "\\";
         }
         else
         {
-            slashType = "/";
+            SlashType = "/";
         }
     }
 }

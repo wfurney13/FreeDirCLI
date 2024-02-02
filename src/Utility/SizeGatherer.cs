@@ -8,22 +8,18 @@ namespace FreeDirCLI
         public static int UnauthorizedAccessExceptionFileCount;
         public static List<string>? UnauthorizedFileList;
         public static string? FilePath;
+        public static bool AllDrives;
 
         public static void CheckForPathAndRun()
-        {
+        {     
             if (FilePath == null) // when there is no file path passed in we want to run for all folders
             {
                 GetSizeOfAllFolders();
             }
             else // otherwise use the file path that was passed in
             {
-                Debug.Assert(FilePath != null);
-                Debug.Assert(Config.slashType != null);
+                FilePathModifier.ValidatePath();
 
-                if (!FilePath.EndsWith(Config.slashType))
-                {
-                   FilePath += Config.slashType;
-                }
                 var nameAndSizePairs = GetSizeOfEachFolderForPath(FilePath);
                 Program.DisplayResults(nameAndSizePairs);
             }
@@ -31,12 +27,12 @@ namespace FreeDirCLI
 
         public static void GetSizeOfAllFolders()
         {
-            if (!Config.diskSizesOnly)
+            if (!Config.DiskSizesOnly)
             {
                 Writer.Write(
                     "Run program for all drives? y/n",
                     ConsoleColor.Blue,
-                    Config.prefersLightMode
+                    Config.PrefersLightMode
                 );
 
                 string? getSizeOfAllFolderResponse = Console.ReadLine();
@@ -50,45 +46,57 @@ namespace FreeDirCLI
                 switch (getSizeOfAllFolderResponse.ToLower())
                 {
                     case "y":
-                        Config.allDisks = true;
+                            AllDrives = true;
+                            Writer.Write(
+                            "The application will now loop through your drives and determine the size of each parent directory. Press CTRL+C to exit the application at any time.",
+                            ConsoleColor.Blue,
+                            Config.PrefersLightMode
+                        );                     
                         break;
                     default:
+                        Console.Clear();
                         //Writer.DisplayHelpMessage();
                         Program.StoredResults = new();
                         UnauthorizedFileList = new();
-                        Writer.Write("Enter File Path to Search:");
-                        Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                        Writer.Write($"\nEnter Full File Path to Search:");
+                        Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
                         Readline.ReadKey(Console.ReadKey(intercept: true));
                         return;
                 }
             }
 
-            if (Program.drives != null)
+            if (Program.Drives != null)
             {
-                foreach (var drive in Program.drives)
+                foreach (var drive in Program.Drives)
                 {
                     Writer.Write(
                         $"\nRetreiving info for {drive}...\n",
                         ConsoleColor.Blue,
-                        Config.prefersLightMode
+                        Config.PrefersLightMode
                     );
                     Writer.Write(
                         $"Total Size: {Math.Round(drive.TotalSize / 1024d / 1024d / 1024d, 2)} GB\nFree Space: {Math.Round(drive.TotalFreeSpace / 1024d / 1024d / 1024d),2} GB\n",
                         ConsoleColor.Blue,
-                        Config.prefersLightMode
+                        Config.PrefersLightMode
                     );
-                    if (!Config.diskSizesOnly)
+                    if (!Config.DiskSizesOnly)
                     {
                         var nameAndSizePairsForDrive = GetSizeOfEachFolderForPath(drive.ToString());
                         Program.DisplayResults(nameAndSizePairsForDrive);
                     }
                 }
+                Program.StoredResults = new();
+                UnauthorizedFileList = new();
+                Writer.Write($"\nEnter Full File Path to Search:");
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
+                Readline.ReadKey(Console.ReadKey(intercept: true));
             }
         }
 
         public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)
         {
-            if (Program.userContinued == false)
+
+            if (Program.UserContinued == false)
             {
                 Program.StoredResults = new();
                 UnauthorizedFileList = new();
@@ -123,7 +131,7 @@ namespace FreeDirCLI
                     Writer.Write(
                         $"No access to dir: {dir.Name}",
                         ConsoleColor.Red,
-                        Config.prefersLightMode
+                        Config.PrefersLightMode
                     );
                 }
             }
@@ -144,12 +152,6 @@ namespace FreeDirCLI
                 SizeGatherer.UnauthorizedAccessExceptionFileCount++;
             }
 
-            Writer.Write(
-                $"\n\n{"Directory Name",-45}\tDirectory Size\n",
-                ConsoleColor.White,
-                Config.prefersLightMode
-            );
-
             return nameSizePairs;
         }
 
@@ -165,7 +167,7 @@ namespace FreeDirCLI
 
                 return directories;
             }
-            catch (DirectoryNotFoundException)
+            catch (Exception)
             {
                 Writer.Write(
                     $"Provided file path ({directoryInfo.FullName}) is invalid\n",
@@ -173,7 +175,7 @@ namespace FreeDirCLI
                     false
                 );
                 FilePathModifier.TrimFilePathBackOneLevel();
-                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
                 Readline.ReadKey(Console.ReadKey(intercept: true));
                 Environment.Exit(0);
                 throw;
