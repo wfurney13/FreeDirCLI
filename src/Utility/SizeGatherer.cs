@@ -1,19 +1,30 @@
+using FreeDirCLI.Utility;
+using System.Diagnostics;
+
 namespace FreeDirCLI
 {
     public class SizeGatherer
     {
         public static int UnauthorizedAccessExceptionFileCount;
-        public static string? filePath;
+        public static List<string>? UnauthorizedFileList;
+        public static string? FilePath;
 
         public static void CheckForPathAndRun()
         {
-            if (filePath == null) // when there is no file path passed in we want to run for all folders
+            if (FilePath == null) // when there is no file path passed in we want to run for all folders
             {
                 GetSizeOfAllFolders();
             }
             else // otherwise use the file path that was passed in
             {
-                var nameAndSizePairs = GetSizeOfEachFolderForPath(filePath);
+                Debug.Assert(FilePath != null);
+                Debug.Assert(Config.slashType != null);
+
+                if (!FilePath.EndsWith(Config.slashType))
+                {
+                   FilePath += Config.slashType;
+                }
+                var nameAndSizePairs = GetSizeOfEachFolderForPath(FilePath);
                 Program.DisplayResults(nameAndSizePairs);
             }
         }
@@ -42,7 +53,12 @@ namespace FreeDirCLI
                         Config.allDisks = true;
                         break;
                     default:
-                        Writer.DisplayHelpMessage();
+                        //Writer.DisplayHelpMessage();
+                        Program.StoredResults = new();
+                        UnauthorizedFileList = new();
+                        Writer.Write("Enter File Path to Search:");
+                        Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                        Readline.ReadKey(Console.ReadKey(intercept: true));
                         return;
                 }
             }
@@ -72,6 +88,16 @@ namespace FreeDirCLI
 
         public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)
         {
+            if (Program.userContinued == false)
+            {
+                Program.StoredResults = new();
+                UnauthorizedFileList = new();
+            }
+
+            Debug.Assert(UnauthorizedFileList != null);
+            UnauthorizedFileList.Clear();
+            UnauthorizedAccessExceptionFileCount = 0;
+
             //create dictionary for holding directory name and sizes
             Dictionary<string, long> nameSizePairs = new();
 
@@ -85,14 +111,13 @@ namespace FreeDirCLI
                 //try to get the dir size, if we dont have access to the dir just continue and let the user know
                 try
                 {
-
                     long dirSize = new FileInfoEnumerable(
-                      dir
-               ).Sum(file => file.Length);
+                        dir
+                    ).Sum(file => file.Length);
 
                     //byte to GB coversion
-                        nameSizePairs.Add(dir.Name, dirSize);
-                   }
+                    nameSizePairs.Add(dir.Name, dirSize);
+                }
                 catch (System.UnauthorizedAccessException) // no access to the dir
                 {
                     Writer.Write(
@@ -111,7 +136,7 @@ namespace FreeDirCLI
                 foreach (var file in files)
                 {
                     long fileSize = file.Length;
-                    nameSizePairs.Add(file.Name,fileSize);
+                    nameSizePairs.Add(file.Name, fileSize);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -135,6 +160,9 @@ namespace FreeDirCLI
             try
             {
                 IEnumerable<DirectoryInfo> directories = directoryInfo.EnumerateDirectories();
+                List<string> dnames = new();
+
+
                 return directories;
             }
             catch (DirectoryNotFoundException)
@@ -144,8 +172,13 @@ namespace FreeDirCLI
                     ConsoleColor.Red,
                     false
                 );
+                FilePathModifier.TrimFilePathBackOneLevel();
+                Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
+                Readline.ReadKey(Console.ReadKey(intercept: true));
+                Environment.Exit(0);
                 throw;
             }
         }
     }
 }
+

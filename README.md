@@ -38,33 +38,15 @@ This will get the names of the subdirectories at that path, add up their file si
 
 <h2>Available Switches</h2>
 
-* Lightmode (-l)
-
-`.\fd.exe -l`
-
-`.\fd.exe -l C:\`
-
-* Order by size descending (-o)
-
-`.\fd.exe -o`
-
-`.\fd.exe -o C:\`
-
-`.\fd.exe -l -o C:\`
-
-![image](/screenshots/orderedlightmode.png)
-
 * Show Drive info only (-d)
 
 `.\fd.exe -d`
-
-`.\fd.exe -l -d`
 
 ![image](/screenshots/drives.png)
 
 * Configuration (-config)
 
-Allows you to save choices for '-l' or '-o'
+Allows you to set whether you prefer lightmode and ordered output.
 
 `.\fd.exe -config`
 

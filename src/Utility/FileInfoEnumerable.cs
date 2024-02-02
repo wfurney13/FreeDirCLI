@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 
 namespace FreeDirCLI
 {
@@ -23,8 +24,10 @@ namespace FreeDirCLI
                     _root.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
                 );
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException e)
             {
+                Debug.Assert(SizeGatherer.UnauthorizedFileList != null);
+                SizeGatherer.UnauthorizedFileList.Add(e.Message);
                 SizeGatherer.UnauthorizedAccessExceptionFileCount++;
                 yield break;
             }
