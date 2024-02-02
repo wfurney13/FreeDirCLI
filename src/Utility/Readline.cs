@@ -145,17 +145,9 @@ public class Readline
                 string builtString = sb.ToString();
                 if (builtString.Length > 0)
                 {
-                    //if there is no direct match, find the closet match for the string (press tab)
-                    
                     foreach (var name in Program.StoredResults)
                     {
-                        if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
-                        {
-                            ConsoleKeyInfo tabKey = new('\u0000', ConsoleKey.Tab, false, false, false);
-                            ReadKey(tabKey);
-                        }
-                        //if there is a direct match, go "up" to the previous result. If there is a direct match and no previous result, go "up" to the last result
-                        else if (name.ToUpper() == builtString.ToUpper())
+                         if (name.ToUpper() == builtString.ToUpper())
                         {
                             //remove the current input
                             for (int x = 0; x < builtString.Length; x++)
@@ -166,7 +158,6 @@ public class Readline
                                     Writer.WriteInline("\b \b");
                                 }
                             }
-
                             builtString = name;
                         }
                     }
@@ -197,17 +188,11 @@ public class Readline
                 string builtString = sb.ToString();
                 if (builtString.Length > 0)
                 {
-                    //if there is no direct match, find the closet match for the string (press tab)
                     Debug.Assert(Program.StoredResults != null);
                     foreach (var name in Program.StoredResults)
                     {
-                        if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
-                        {
-                            ConsoleKeyInfo tabKey = new('\u0000', ConsoleKey.Tab, false, false, false);
-                            ReadKey(tabKey);
-                        }
-                        //if there is a direct match, go "up" to the previous result. If there is a direct match and no previous result, go "up" to the last result
-                        else if (name.ToUpper() == builtString.ToUpper())
+                        //if there is a direct match, go down to the next result
+                        if (name.ToUpper() == builtString.ToUpper())
                         {
                             //remove the current input
                             for (int x = 0; x < builtString.Length; x++)
@@ -225,7 +210,7 @@ public class Readline
 
                     if (Program.StoredResults.Contains(builtString))
                     {
-                        int index = Program.StoredResults.FindIndex(x => x.StartsWith(builtString));
+                        int index = Program.StoredResults.FindIndex(x => x.Equals(builtString));
                         //top of the list, go to the bottom
                         if (index != Program.StoredResults.Count - 1)
                         {

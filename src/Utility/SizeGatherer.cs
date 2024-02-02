@@ -56,11 +56,8 @@ namespace FreeDirCLI
                     default:
                         Console.Clear();
                         //Writer.DisplayHelpMessage();
-                        Program.StoredResults = new();
-                        UnauthorizedFileList = new();
-                        Writer.Write($"\nEnter Full File Path to Search:");
-                        Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
-                        Readline.ReadKey(Console.ReadKey(intercept: true));
+                        Writer.Write("\nEnter Full File Path to Search:");
+                        Program.UserContinuing();
                         return;
                 }
             }
@@ -85,12 +82,15 @@ namespace FreeDirCLI
                         Program.DisplayResults(nameAndSizePairsForDrive);
                     }
                 }
-                Program.StoredResults = new();
-                UnauthorizedFileList = new();
-                Writer.Write($"\nEnter Full File Path to Search:");
-                Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
-                Readline.ReadKey(Console.ReadKey(intercept: true));
+
+                Writer.Write(
+                    $"(:q to quit, :b to go back)",
+                    ConsoleColor.Green,
+                    Config.PrefersLightMode
+                );
+                Program.UserContinuing();
             }
+            
         }
 
         public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)
@@ -114,26 +114,35 @@ namespace FreeDirCLI
 
             var directories = TryEnumerateDirectories(dirInfo);
 
-            foreach (var dir in directories)
+            try
             {
-                //try to get the dir size, if we dont have access to the dir just continue and let the user know
-                try
+                foreach (var dir in directories)
                 {
-                    long dirSize = new FileInfoEnumerable(
-                        dir
-                    ).Sum(file => file.Length);
+                    //try to get the dir size, if we dont have access to the dir just continue and let the user know
+                    try
+                    {
+                        long dirSize = new FileInfoEnumerable(
+                            dir
+                        ).Sum(file => file.Length);
 
-                    //byte to GB coversion
-                    nameSizePairs.Add(dir.Name, dirSize);
+                        //byte to GB coversion
+                        nameSizePairs.Add(dir.Name, dirSize);
+                    }
+                    catch (System.UnauthorizedAccessException) // no access to the dir
+                    {
+                        Writer.Write(
+                            $"No access to dir: {dir.Name}",
+                            ConsoleColor.Red,
+                            Config.PrefersLightMode
+                        );
+                    }
                 }
-                catch (System.UnauthorizedAccessException) // no access to the dir
-                {
-                    Writer.Write(
-                        $"No access to dir: {dir.Name}",
-                        ConsoleColor.Red,
-                        Config.PrefersLightMode
-                    );
-                }
+            }
+            catch (Exception)
+            {
+                Writer.Write($"Error enumerating directories at path {filePath}. Enter a new path:", ConsoleColor.Red, false);
+                FilePathModifier.TrimFilePathBackOneLevel();
+                Program.UserContinuing();
             }
 
             // try to enumerate files at the parent as well
@@ -169,14 +178,7 @@ namespace FreeDirCLI
             }
             catch (Exception)
             {
-                Writer.Write(
-                    $"Provided file path ({directoryInfo.FullName}) is invalid\n",
-                    ConsoleColor.Red,
-                    false
-                );
-                FilePathModifier.TrimFilePathBackOneLevel();
-                Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
-                Readline.ReadKey(Console.ReadKey(intercept: true));
+                FilePathModifier.InvalidPathResponse();
                 Environment.Exit(0);
                 throw;
             }
