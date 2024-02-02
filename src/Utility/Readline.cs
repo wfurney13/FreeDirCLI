@@ -57,7 +57,7 @@ public class Readline
         else
         {
           
-            Debug.Assert(Program.DirectoryNames != null);
+            Debug.Assert(Program.StoredResults != null);
 
             if (Program.drives != null)
             {
@@ -105,6 +105,9 @@ public class Readline
     {
         while (keyPressed.Key != ConsoleKey.Enter)
         {
+            Debug.Assert(Program.StoredResults != null);
+            
+           
             if (keyPressed.Key == ConsoleKey.Backspace)
             {
                 if (sb.Length > 0)
@@ -114,25 +117,25 @@ public class Readline
                 }
             }
             //arrow keys
-            else if (keyPressed.Key == ConsoleKey.LeftArrow)
+            else if (keyPressed.Key == ConsoleKey.LeftArrow && Program.StoredResults.Count > 0)
             {
                 sb.Remove(0, sb.Length);
                 Read(":b");
             }
-            else if (keyPressed.Key == ConsoleKey.RightArrow)
+            else if (keyPressed.Key == ConsoleKey.RightArrow && Program.StoredResults.Count > 0)
             {
                 ConsoleKeyInfo enterKey = new('\u0000', ConsoleKey.Enter, false, false, false);
                 ReadKey(enterKey);
             }
 
-            else if (keyPressed.Key == ConsoleKey.UpArrow)
+            else if (keyPressed.Key == ConsoleKey.UpArrow && Program.StoredResults.Count > 0)
             {
                 string builtString = sb.ToString();
                 if (builtString.Length > 0)
                 {
                     //if there is no direct match, find the closet match for the string (press tab)
-                    Debug.Assert(Program.DirectoryNames != null);
-                    foreach (var name in Program.DirectoryNames)
+                    
+                    foreach (var name in Program.StoredResults)
                     {
                         if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
                         {
@@ -156,35 +159,35 @@ public class Readline
                         }
                     }
 
-                    if (Program.DirectoryNames.Contains(builtString))
+                    if (Program.StoredResults.Contains(builtString))
                     {
-                        int index = Program.DirectoryNames.FindIndex(x => x.StartsWith(builtString));
+                        int index = Program.StoredResults.FindIndex(x => x.StartsWith(builtString));
                         //top of the list, go to the bottom
                         if (index != 0)
                         {
                             index = index - 1;
                         }
 
-                        Writer.WriteInline(Program.DirectoryNames[index]);
-                        sb.Append(Program.DirectoryNames[index]);
+                        Writer.WriteInline(Program.StoredResults[index]);
+                        sb.Append(Program.StoredResults[index]);
                     }
                 }
                 else // there is no string and they hit up arrow, start at bottom of the list
                 {
-                    Debug.Assert(Program.DirectoryNames != null);
-                    Writer.WriteInline(Program.DirectoryNames[^1]);
-                    sb.Append(Program.DirectoryNames[^1]);
+                    Debug.Assert(Program.StoredResults != null);
+                    Writer.WriteInline(Program.StoredResults[^1]);
+                    sb.Append(Program.StoredResults[^1]);
                 }
             }
 
-            else if (keyPressed.Key == ConsoleKey.DownArrow)
+            else if (keyPressed.Key == ConsoleKey.DownArrow && Program.StoredResults.Count > 0)
             {
                 string builtString = sb.ToString();
                 if (builtString.Length > 0)
                 {
                     //if there is no direct match, find the closet match for the string (press tab)
-                    Debug.Assert(Program.DirectoryNames != null);
-                    foreach (var name in Program.DirectoryNames)
+                    Debug.Assert(Program.StoredResults != null);
+                    foreach (var name in Program.StoredResults)
                     {
                         if (name.ToUpper() != builtString.ToUpper() && name.ToUpper().StartsWith(builtString.ToUpper()))
                         {
@@ -208,34 +211,34 @@ public class Readline
                         }
                     }
 
-                    if (Program.DirectoryNames.Contains(builtString))
+                    if (Program.StoredResults.Contains(builtString))
                     {
-                        int index = Program.DirectoryNames.FindIndex(x => x.StartsWith(builtString));
+                        int index = Program.StoredResults.FindIndex(x => x.StartsWith(builtString));
                         //top of the list, go to the bottom
-                        if (index != Program.DirectoryNames.Count - 1)
+                        if (index != Program.StoredResults.Count - 1)
                         {
                             index = index + 1;
                         }
 
-                        Writer.WriteInline(Program.DirectoryNames[index]);
-                        sb.Append(Program.DirectoryNames[index]);
+                        Writer.WriteInline(Program.StoredResults[index]);
+                        sb.Append(Program.StoredResults[index]);
                     }
                 }
                 else // there is no string and they hit up arrow, start at bottom of the list
                 {
-                    Debug.Assert(Program.DirectoryNames != null);
-                    Writer.WriteInline(Program.DirectoryNames[0]);
-                    sb.Append(Program.DirectoryNames[0]);
+                    Debug.Assert(Program.StoredResults != null);
+                    Writer.WriteInline(Program.StoredResults[0]);
+                    sb.Append(Program.StoredResults[0]);
                 }
             }
             //tab completion (first match)
-            else if (keyPressed.Key == ConsoleKey.Tab)
+            else if (keyPressed.Key == ConsoleKey.Tab && Program.StoredResults.Count > 0)
             {
                 string builtString = sb.ToString();
 
-                Debug.Assert(Program.DirectoryNames != null);
+                Debug.Assert(Program.StoredResults != null);
 
-                foreach (string name in Program.DirectoryNames)
+                foreach (string name in Program.StoredResults)
                 {
                     if (name.ToUpper().StartsWith(builtString.ToUpper()))
                     {

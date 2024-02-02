@@ -18,6 +18,12 @@ namespace FreeDirCLI
             else // otherwise use the file path that was passed in
             {
                 Debug.Assert(FilePath != null);
+                Debug.Assert(Config.slashType != null);
+
+                if (!FilePath.EndsWith(Config.slashType))
+                {
+                   FilePath += Config.slashType;
+                }
                 var nameAndSizePairs = GetSizeOfEachFolderForPath(FilePath);
                 Program.DisplayResults(nameAndSizePairs);
             }
@@ -48,9 +54,11 @@ namespace FreeDirCLI
                         break;
                     default:
                         //Writer.DisplayHelpMessage();
+                        Program.StoredResults = new();
+                        UnauthorizedFileList = new();
                         Writer.Write("Enter File Path to Search:");
                         Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
-                        Readline.Read(Console.ReadLine());
+                        Readline.ReadKey(Console.ReadKey(intercept: true));
                         return;
                 }
             }
@@ -82,7 +90,7 @@ namespace FreeDirCLI
         {
             if (Program.userContinued == false)
             {
-                Program.DirectoryNames = new();
+                Program.StoredResults = new();
                 UnauthorizedFileList = new();
             }
 
@@ -166,7 +174,7 @@ namespace FreeDirCLI
                 );
                 FilePathModifier.TrimFilePathBackOneLevel();
                 Writer.WriteInline("> ", ConsoleColor.Green, Config.prefersLightMode);
-                Readline.Read(Console.ReadLine());
+                Readline.ReadKey(Console.ReadKey(intercept: true));
                 Environment.Exit(0);
                 throw;
             }

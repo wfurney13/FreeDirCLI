@@ -9,7 +9,7 @@ class Program
 {
     public static bool userContinued;
     public static DriveInfo[]? drives;
-    public static List<string>? DirectoryNames;
+    public static List<string>? StoredResults;
 
     static void Main(string[] args)
     {
@@ -54,29 +54,22 @@ class Program
                 SizeGatherer.FilePath = args[1];
             }
         }
-
-        Debug.Assert(SizeGatherer.FilePath != null);
-
-        if (!SizeGatherer.FilePath.EndsWith(Config.slashType))
-        {
-            SizeGatherer.FilePath += Config.slashType;
-        }
     }
 
     static void StoreResults(Dictionary<string, long> results)
     {
-        Debug.Assert(DirectoryNames is not null);
+        Debug.Assert(StoredResults is not null);
 
-        if (DirectoryNames.Any())
+        if (StoredResults.Any())
         {
-            DirectoryNames.Clear();
+            StoredResults.Clear();
         }
 
         var resultsDict = results.Keys.ToList();
 
         foreach (var result in resultsDict)
         {
-            DirectoryNames.Add(result);
+            StoredResults.Add(result);
         }
     }
 
@@ -96,7 +89,7 @@ class Program
         );
     }
 
-
+    
     public static void DisplayResults(Dictionary<string, long> pairs)
     {
         double totalSize = 0;
