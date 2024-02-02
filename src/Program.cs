@@ -176,7 +176,8 @@ class Program
             FilePathModifier.TrimFilePathBackOneLevel();
         }
 
-        UserContinuing();
+        if (!SizeGatherer.AllDrives)
+            UserContinuing();
     }
 
     public static void UserContinuing()
@@ -190,6 +191,7 @@ class Program
         {
             SizeGatherer.UnauthorizedFileList = new();
         }
+
         Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
         Readline.ReadKey(Console.ReadKey(intercept: true));
     }

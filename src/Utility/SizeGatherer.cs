@@ -82,8 +82,15 @@ namespace FreeDirCLI
                         Program.DisplayResults(nameAndSizePairsForDrive);
                     }
                 }
+
+                Writer.Write(
+                    $"(:q to quit, :b to go back)",
+                    ConsoleColor.Green,
+                    Config.PrefersLightMode
+                );
                 Program.UserContinuing();
             }
+            
         }
 
         public static Dictionary<string, long> GetSizeOfEachFolderForPath(string filePath)

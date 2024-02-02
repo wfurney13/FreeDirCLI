@@ -13,6 +13,7 @@ public class FilePathModifier
         {
             // reset the errored files and do nothing
             SizeGatherer.UnauthorizedAccessExceptionFileCount = 0;
+            Writer.Write("Refereshing...");
         }
         else
         {
