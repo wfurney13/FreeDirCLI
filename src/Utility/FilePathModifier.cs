@@ -91,9 +91,13 @@ public class FilePathModifier
                     ConsoleColor.Red,
                     false
                 );
-        if (SizeGatherer.FilePath != null)
+        if (SizeGatherer.FilePath != null && SizeGatherer.FilePath.Length > 5 && SizeGatherer.FilePath.Contains($":{Config.SlashType}"))
         {
             TrimFilePathBackOneLevel();
+        }
+        else
+        {
+            SizeGatherer.FilePath = "";
         }
         Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
         Readline.ReadKey(Console.ReadKey(intercept: true));

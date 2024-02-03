@@ -50,16 +50,24 @@ public class Readline
             if (consoleResponse == ":b")
             {
 
-                FilePathModifier.TrimFilePathBackOneLevel();
+                if (SizeGatherer.FilePath != null && SizeGatherer.FilePath.Length > 3)
+                {
+                    FilePathModifier.TrimFilePathBackOneLevel();
 
-                Program.UserContinued = true;
+                    Program.UserContinued = true;
 
-                Debug.Assert(SizeGatherer.FilePath != null);
+                    Debug.Assert(SizeGatherer.FilePath != null);
 
-                var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
-                        SizeGatherer.FilePath
-                        );
-                Program.DisplayResults(nameAndSizePairs);
+                    var nameAndSizePairs = SizeGatherer.GetSizeOfEachFolderForPath(
+                            SizeGatherer.FilePath
+                            );
+                    Program.DisplayResults(nameAndSizePairs);
+                }
+                else
+                {
+                    Writer.Write("Current path is at the head of the drive. Enter a new path instead of using :b", ConsoleColor.Red, false);
+                    Program.UserContinuing();
+                }
             }
         }
 
