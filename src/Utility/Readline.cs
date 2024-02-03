@@ -27,6 +27,7 @@ public class Readline
             {
                 Environment.Exit(0);
             }
+
             if (consoleResponse == ":which")
             {
                 Debug.Assert(SizeGatherer.UnauthorizedFileList != null);
@@ -36,6 +37,14 @@ public class Readline
             }
             Writer.WriteInline("> ", ConsoleColor.Green, Config.PrefersLightMode);
             ReadKey(Console.ReadKey(intercept: true));
+            }
+
+            if (consoleResponse == ":config")
+            {
+                string[] s = new string[1];
+                s[0] = "-config";
+
+                Config.CheckConfig(s);
             }
 
             if (consoleResponse == ":b")
@@ -118,8 +127,8 @@ public class Readline
         while (keyPressed.Key != ConsoleKey.Enter)
         {
             Debug.Assert(Program.StoredResults != null);
-            
-           
+
+
             if (keyPressed.Key == ConsoleKey.Backspace)
             {
                 if (sb.Length > 0)
@@ -127,6 +136,10 @@ public class Readline
                     sb.Remove(sb.Length - 1, 1);
                     Writer.WriteInline("\b \b");
                 }
+            }
+            else if (keyPressed.Key == ConsoleKey.LeftArrow && (SizeGatherer.FilePath == null || SizeGatherer.FilePath.Length <= 3))
+            {
+                ReadKey(Console.ReadKey(intercept: true));
             }
             //arrow keys
             else if (keyPressed.Key == ConsoleKey.LeftArrow && Program.StoredResults.Count > 0)
@@ -147,7 +160,7 @@ public class Readline
                 {
                     foreach (var name in Program.StoredResults)
                     {
-                         if (name.ToUpper() == builtString.ToUpper())
+                        if (name.ToUpper() == builtString.ToUpper())
                         {
                             //remove the current input
                             for (int x = 0; x < builtString.Length; x++)

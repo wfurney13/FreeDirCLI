@@ -8,15 +8,7 @@ public class FilePathModifier
     public static void TrimFilePathBackOneLevel()
     {
         Debug.Assert(SizeGatherer.FilePath != null);
-        if (SizeGatherer.FilePath.Length == 3 &&
-            SizeGatherer.FilePath.EndsWith($"{Config.SlashType}"))
-        {
-            // reset the errored files and do nothing
-            SizeGatherer.UnauthorizedAccessExceptionFileCount = 0;
-            Writer.Write("Refereshing...");
-        }
-        else
-        {
+
             if (!SizeGatherer.FilePath.EndsWith($"{Config.SlashType}"))
             {
                 SizeGatherer.FilePath += $"{Config.SlashType}";
@@ -34,9 +26,7 @@ public class FilePathModifier
                 }
             }
 
-            ValidatePath();
-        }
-
+            ValidatePath();     
         
     }
 

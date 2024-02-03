@@ -56,7 +56,7 @@ namespace FreeDirCLI
                     default:
                         Console.Clear();
                         //Writer.DisplayHelpMessage();
-                        Writer.Write("\nEnter Full File Path to Search:");
+                        Writer.Write("\nEnter File Path:");
                         Program.UserContinuing();
                         return;
                 }

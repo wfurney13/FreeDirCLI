@@ -72,7 +72,7 @@ class Config
     static void ConfigRecreate()
     {
         Writer.Write(
-            $"Configuration file already exists. Would you like to delete and recreate the config file? y/n",
+            $"Configuration file already exists at {configPath}. Would you like to delete and recreate the config file? y/n",
             ConsoleColor.White,
             true
         );
@@ -88,12 +88,14 @@ class Config
         {
             case "y":
                 CreateConfigFile();
-                Environment.Exit(0);
+                SetConfigChoices();
+                Writer.Write("\nEnter File Path:");
+                Program.UserContinuing();
                 break;
             default:
-                Writer.DisplayHelpMessage();
-                Environment.Exit(0);
-                break;
+                Writer.Write("\nEnter File Path:");
+                Program.UserContinuing();
+                return;
         }
     }
 
@@ -170,10 +172,6 @@ class Config
                 CreateConfigFile();
             }
 
-            if (configPath != null)
-            {
-                Writer.Write(configPath);
-            }
         }
 
         if (File.Exists(configPath))
